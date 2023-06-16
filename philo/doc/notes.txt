@@ -1,0 +1,7 @@
+pthread_create,			- create thread
+pthread_detach, 		- detaches the thread so that when it terminates, it's resources are released and it cannot be joined
+pthread_join,			- joins a thread, waiting until it returns and gets its return value and gains its memory and other resources.
+pthread_mutex_init,		- destroy and initialize a mutex
+pthread_mutex_destroy	- destroy the given mutex object
+pthread_mutex_lock		- locks the mutex object or waits until it is freed and then locks
+pthread_mutex_unlock	- unlocks the mutex object
