@@ -30,7 +30,6 @@ t_philosopher	*philosophize(t_philosopher *phil)
 		deep_think(phil);
 		think(phil);
 		eat(phil);
-		gettimeofday(&tv, NULL);
 		if (phil->mm != 0)
 			if (--phil->mm == 0)
 				break ;
@@ -38,18 +37,9 @@ t_philosopher	*philosophize(t_philosopher *phil)
 	return (phil);
 }
 
-void	*philosophize_testing(t_philosopher *phil)
-{
-	int	i;
-
-	i = 0;
-	while (++i < 100)
-		think(phil);
-	return (NULL);
-}
-
 int	phallocate(t_fork **utensils, t_philosopher **phils, unsigned int args[])
 {
+	// TODO: close mutexes
 	*phils = malloc(sizeof(t_philosopher) * args[no_of_phils]);
 	if (*phils == NULL)
 		return (1);
@@ -94,7 +84,7 @@ void	phree(t_philosopher *phil)
 	free(phil);
 }
 
-pthread_t	*great_commission(t_philosopher *phils, int philc)
+pthread_t	*phacilitate(t_philosopher *phils, int philc)
 {
 	pthread_t	*threads;
 	int			i;
@@ -104,12 +94,12 @@ pthread_t	*great_commission(t_philosopher *phils, int philc)
 		return (NULL);
 	i = -1;
 	while (++i < philc)
-		pthread_create(&threads[i], NULL, (void * (*)(void *))philosophize, (void *)&phils[i]);
+		pthread_create(&threads[i], NULL, (void * (*)(void *))philosophize,
+			(void *)&phils[i]);
 	return (threads);
 }
-/* Arguments:
-philno, ttd, tte, tts, max_meals
-*/
+
+// Arguments: philno, ttd, tte, tts, max_meals
 int	main(int argc, char *argv[])
 {
 	unsigned int	args[5];
@@ -122,8 +112,7 @@ int	main(int argc, char *argv[])
 	if (argc == 5)
 		args[max_meals] = 0;
 	phils = phinitialize(args);
-	threads = great_commission(phils, args[no_of_phils]);
-
+	threads = phacilitate(phils, args[no_of_phils]);
 	i = 0;
 	while (i < args[no_of_phils])
 		pthread_join(threads[i++], NULL);
