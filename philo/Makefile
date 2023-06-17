@@ -32,7 +32,7 @@ INCDIR = include
 
 INCDIR_BONUS = include_bonus
 
-_SRC = philo_main.c parsing.c
+_SRC = philo_main.c parsing.c philosopher_actions.c
 SRC = $(patsubst %, $(SRCDIR)/%, $(_SRC))
 
 _OBJ = $(patsubst %.c, %.o, $(_SRC))

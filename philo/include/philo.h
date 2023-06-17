@@ -11,6 +11,7 @@
 /* ************************************************************************** */
 #ifndef PHILO_H
 # define PHILO_H
+# include <pthread.h>
 
 /* Arguments:
 number_of_philosophers
@@ -31,7 +32,8 @@ enum e_args
 
 typedef struct s_fork
 {
-	volatile int	taken;	// unsure if volatile is required here
+	volatile int	taken;
+	pthread_mutex_t	mutex;
 }	t_fork;
 
 typedef struct s_philosopher
@@ -43,20 +45,23 @@ typedef struct s_philosopher
 	int		mm;
 	int		eat_count;
 	int		dead;
-	t_fork	*r_utensil;		// volatile here??
-	t_fork	*l_utensil;		// volatile here??
+	int		prev_meal;
+	t_fork	*r_utensil;
+	t_fork	*l_utensil;
 }	t_philosopher;
 
 int		parse_args(int argc, char *argv[], unsigned int args[]);
 
-void	eat(t_philosopher phil);
+void	die(t_philosopher *phil);
 
-void	think(t_philosopher phil);
+void	eat(t_philosopher *phil);
 
-void	deep_think(t_philosopher phil);
+void	think(t_philosopher *phil);
 
-void	take_fork(t_philosopher phil);
+void	deep_think(t_philosopher *phil);
 
-void	drop_fork(t_philosopher phil);
+void	take_fork(t_fork *f);
+
+void	drop_fork(t_fork *f);
 
 #endif

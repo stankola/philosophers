@@ -16,46 +16,72 @@
 #include <sys/time.h>
 #include "philo.h"
 
-/*
-void	philosophize(t_philosopher phil)
+// sleep
+// think
+// eat
+t_philosopher	*philosophize(t_philosopher *phil)
 {
-	struct timeval	prev_meal;
-	int				etd;
+	struct timeval	tv;
 
-	gettimeofday(&prev_meal, NULL);		// might fail
-	while (1)
+	gettimeofday(&tv, NULL);
+	phil->prev_meal = tv.tv_usec / 1000;
+	while (1 && phil->dead != 1)
 	{
-		think(phil);
 		deep_think(phil);
+		think(phil);
 		eat(phil);
+		gettimeofday(&tv, NULL);
+		if (phil->mm != 0)
+			if (--phil->mm == 0)
+				break ;
 	}
+	return (phil);
 }
-*/
-t_philosopher	*phinitialize(unsigned int a[]) // TODO: Consider a without max_meals
+
+void	*philosophize_testing(t_philosopher *phil)
+{
+	int	i;
+
+	i = 0;
+	while (++i < 100)
+		think(phil);
+	return (NULL);
+}
+
+int	phallocate(t_fork **utensils, t_philosopher **phils, unsigned int args[])
+{
+	*phils = malloc(sizeof(t_philosopher) * args[no_of_phils]);
+	if (*phils == NULL)
+		return (1);
+	*utensils = malloc(sizeof(t_fork) * args[no_of_phils]);
+	if (*utensils == NULL)
+	{
+		free(*phils);
+		return (1);
+	}
+	return (0);
+}
+
+t_philosopher	*phinitialize(unsigned int a[])
 {
 	t_fork			*u;
 	t_philosopher	*phils;
 	unsigned int	i;
 
-	phils = malloc(sizeof(t_philosopher) * a[no_of_phils]);
-	if (phils == NULL)
+	if (phallocate(&u, &phils, a))
 		return (NULL);
-	u = malloc(sizeof(t_fork) * a[no_of_phils]);
-	if (u == NULL)
-	{
-		free(phils);
-		return (NULL);
-	}
 	i = 0;
 	while (++i < a[no_of_phils])
 	{
 		u[i].taken = 0;
+		pthread_mutex_init(&u[i].mutex, NULL);	// Might fail
 		phils[i] = (t_philosopher){i + 1, a[time_to_die], a[time_to_eat],
-			a[time_to_sleep], a[max_meals], 0, 0, &u[i], &u[i - 1]};
+			a[time_to_sleep], a[max_meals], 0, 0, 0, &u[i], &u[i - 1]};
 	}
 	u[0].taken = 0;
+	pthread_mutex_init(&u[0].mutex, NULL);	// Might fail
 	phils[0] = (t_philosopher){1, a[time_to_die], a[time_to_eat],
-		a[time_to_sleep], a[max_meals], 0, 0, &u[0], &u[a[no_of_phils - 1]]};
+		a[time_to_sleep], a[max_meals], 0, 0, 0, &u[0], &u[a[no_of_phils] - 1]};
 	return (phils);
 }
 
@@ -63,33 +89,44 @@ void	phree(t_philosopher *phil)
 {
 	if (phil->r_utensil != NULL)
 		free(phil->r_utensil);
-	if (phil->l_utensil != NULL)
-		free(phil->l_utensil);
 	phil->l_utensil = NULL;
 	phil->r_utensil = NULL;
 	free(phil);
 }
 
-/* Arguments:
-number_of_philosophers
-time_to_die
-time_to_eat
-time_to_sleep
-[number_of_times_each_philosopher_must_eat]
-Let valid values belong to the range [0,UINT_MAX]
-*/
+pthread_t	*great_commission(t_philosopher *phils, int philc)
+{
+	pthread_t	*threads;
+	int			i;
 
+	threads = malloc(sizeof(pthread_t) * philc);
+	if (threads == NULL)
+		return (NULL);
+	i = -1;
+	while (++i < philc)
+		pthread_create(&threads[i], NULL, (void * (*)(void *))philosophize, (void *)&phils[i]);
+	return (threads);
+}
+/* Arguments:
+philno, ttd, tte, tts, max_meals
+*/
 int	main(int argc, char *argv[])
 {
-	unsigned int			args[5];
-	t_philosopher			*phils;
+	unsigned int	args[5];
+	t_philosopher	*phils;
+	pthread_t		*threads;
+	unsigned int	i;
 
 	if (parse_args(argc, argv, args))
 		return (22);
 	if (argc == 5)
-		args[max_meals] = -1;
+		args[max_meals] = 0;
 	phils = phinitialize(args);
-//	for (unsigned int i = 0; i < args[no_of_phils]; i++)
-//		printf("%d %d %d %d %d\n", phils[i].id, phils[i].ttd, phils[i].mm, phils[i].r_utensil->taken, phils[i].l_utensil->taken);
+	threads = great_commission(phils, args[no_of_phils]);
+
+	i = 0;
+	while (i < args[no_of_phils])
+		pthread_join(threads[i++], NULL);
+	phree(phils);
 	return (0);
 }
