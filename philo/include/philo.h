@@ -12,6 +12,8 @@
 #ifndef PHILO_H
 # define PHILO_H
 # include <pthread.h>
+# include <sys/time.h>
+# define WAIT_INCREMENT_SIZE 10	// waiting increment size in microseconds
 
 /* Arguments:
 number_of_philosophers
@@ -33,35 +35,44 @@ enum e_args
 typedef struct s_fork
 {
 	volatile int	taken;
-	pthread_mutex_t	mutex;
+	pthread_mutex_t	taken_mutex;
+	pthread_mutex_t	fork_mutex;
 }	t_fork;
 
 typedef struct s_philosopher
 {
-	int		id;
-	int		ttd;
-	int		tte;
-	int		tts;
-	int		mm;
-	int		eat_count;
-	int		dead;
-	int		prev_meal;
-	t_fork	*r_utensil;
-	t_fork	*l_utensil;
+	int			id;
+	int			ttd;
+	int			tte;
+	int			tts;
+	int			mm;
+	int			eat_count;
+	int			dead;
+	long int	prev_meal;
+	long int	inception;
+	t_fork		*r_utensil;
+	t_fork		*l_utensil;
+	pthread_mutex_t	*death_mutex;
 }	t_philosopher;
 
-int		parse_args(int argc, char *argv[], unsigned int args[]);
+long int	get_time_in_us();
 
-void	die(t_philosopher *phil);
+long int	get_time_in_ms();
 
-void	eat(t_philosopher *phil);
+int			parse_args(int argc, char *argv[], unsigned int args[]);
 
-void	think(t_philosopher *phil);
+void		die(t_philosopher *phil);
 
-void	deep_think(t_philosopher *phil);
+void		eat(t_philosopher *phil);
 
-void	take_fork(t_fork *f);
+void		think(t_philosopher *phil);
 
-void	drop_fork(t_fork *f);
+void		deep_think(t_philosopher *phil);
+
+void		take_fork(t_philosopher *phil, t_fork *f);
+
+//void	take_fork(t_fork *f);
+
+void		drop_fork(t_fork *f);
 
 #endif
