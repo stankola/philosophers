@@ -13,7 +13,7 @@
 # define PHILO_H
 # include <pthread.h>
 # include <sys/time.h>
-# define WAIT_INCREMENT_SIZE 10	// waiting increment size in microseconds
+# define SLEEP_CYCLE 100	// waiting increment size in microseconds
 
 /* Arguments:
 number_of_philosophers
@@ -35,7 +35,7 @@ enum e_args
 typedef struct s_fork
 {
 	volatile int	taken;
-	pthread_mutex_t	taken_mutex;
+	pthread_mutex_t	grab_mutex;
 	pthread_mutex_t	fork_mutex;
 }	t_fork;
 

@@ -23,9 +23,9 @@ t_philosopher	*philosophize(t_philosopher *phil)
 {
 	void		(*actions[3]) (t_philosopher *) = {deep_think, think, eat};
 	int			i;
-	static int	death = 0;
+	static volatile int	death = 0;
 
-	phil->prev_meal = get_time_in_us();
+	phil->prev_meal = get_time_in_ms();
 	i = phil->id % 2;
 	while (! phil->dead)
 	{
@@ -74,7 +74,7 @@ int	finitialize(t_fork *f)
 {
 	f->taken = 0;
 	if (pthread_mutex_init(&f->fork_mutex, NULL) != 0
-		|| pthread_mutex_init(&f->taken_mutex, NULL) != 0)
+		|| pthread_mutex_init(&f->grab_mutex, NULL) != 0)
 		return (0);
 	return (1);
 }
@@ -104,9 +104,18 @@ t_philosopher	*phinitialize(unsigned int a[])
 	return (ps);
 }
 
-void	phree(t_philosopher *phil)
+void	phree(t_philosopher *phil, int philc)
 {
-		// TODO: close mutexes
+	int	i;
+
+	i = 0;
+	while (i < philc)
+	{
+		pthread_mutex_destroy(&phil[i].r_utensil->fork_mutex);
+		pthread_mutex_destroy(&phil[i].r_utensil->grab_mutex);
+		i++;
+	}
+	pthread_mutex_destroy(phil->death_mutex);
 	if (phil->r_utensil != NULL)
 		free(phil->r_utensil);
 	phil->l_utensil = NULL;
@@ -151,6 +160,6 @@ int	main(int argc, char *argv[])
 		while (i < args[no_of_phils])
 			pthread_join(threads[i++], NULL);
 	}
-	phree(phils);
+	phree(phils, args[no_of_phils]);
 	return (0);
 }
