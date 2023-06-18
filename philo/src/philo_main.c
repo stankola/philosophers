@@ -24,6 +24,7 @@ t_philosopher	*philosophize(t_philosopher *phil)
 	void		(*actions[3]) (t_philosopher *) = {deep_think, think, eat};
 	int			i;
 	static volatile int	death = 0;
+	long int wait_time = 0;
 
 	phil->prev_meal = get_time_in_ms();
 	i = phil->id % 2;
@@ -32,12 +33,14 @@ t_philosopher	*philosophize(t_philosopher *phil)
 		actions[i](phil);
 		if ((i + 1) % 3 == 0 && ! phil->dead && phil->mm != 0 && ! --phil->mm)
 			return (phil);
+		wait_time = get_time_in_ms();
 		pthread_mutex_lock(phil->death_mutex);
 		if (death)
 		{
 			pthread_mutex_unlock(phil->death_mutex);
 			return (phil);
 		}
+		printf("%d Waited on death_mutex for %ld ms\n", phil->id, get_time_in_ms() - wait_time);
 		pthread_mutex_unlock(phil->death_mutex);
 		i = (i + 1) % 3;
 	}

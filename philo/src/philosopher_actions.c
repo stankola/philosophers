@@ -91,7 +91,7 @@ void	deep_think(t_philosopher *phil)
 	long int	sleep_start;
 
 	sleep_start = get_time_in_ms();
-	printf("%ld %d is sleeping\n", get_time_in_ms() - phil->inception, phil->id);
+	printf("%ld %d is sleeping\n", sleep_start - phil->inception, phil->id);
 	while (!phil->dead && (get_time_in_ms() - phil->tts) < sleep_start)
 	{
 		usleep(SLEEP_CYCLE);
@@ -103,9 +103,13 @@ void	deep_think(t_philosopher *phil)
 
 void	take_fork(t_philosopher *phil, t_fork *f)
 {
+	long int wait_time = 0;
+
+	wait_time = get_time_in_ms();
 	while (! phil->dead)
 	{
 		pthread_mutex_lock(&(f->grab_mutex));
+		printf("%d Waited on grab_mutex to take for %ld ms\n", phil->id, get_time_in_ms() - wait_time);
 		if (f->taken == 0)
 		{
 			f->taken = 1;
