@@ -23,7 +23,7 @@ static int	check_form_uint(char *s)
 	return (0);
 }
 
-static int	check_value_uint(char *s, unsigned int *value)
+static int	get_value_uint(char *s, unsigned int *value)
 {
 	*value = 0;
 	while (*s != '\0')
@@ -41,7 +41,7 @@ static int	check_value_uint(char *s, unsigned int *value)
 
 static int	atoui(char *s, unsigned int *value)
 {
-	if (!check_form_uint(s) || !check_value_uint(s, value))
+	if (!check_form_uint(s) || !get_value_uint(s, value))
 		return (0);
 	return (1);
 }
@@ -55,7 +55,7 @@ int	parse_args(int argc, char *argv[], unsigned int args[])
 	i = 0;
 	while (i < argc - 1)
 	{
-		if (! atoui(argv[i + 1], &args[i]))
+		if (! atoui(argv[i + 1], &args[i]))	//TODO sanity check, what if tts + tte > ttd ??
 			return (22);
 		i++;
 	}
