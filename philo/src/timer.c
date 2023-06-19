@@ -17,3 +17,8 @@ long int	get_time_in_ms()
 	gettimeofday(&now, NULL);	// Might fail
 	return (now.tv_sec * 1000 + now.tv_usec / 1000);
 }
+
+long int	get_elapsed_time(long int since)
+{
+	return (get_time_in_ms() - since);
+}

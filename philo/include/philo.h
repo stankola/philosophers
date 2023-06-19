@@ -46,10 +46,10 @@ typedef struct s_philosopher
 	int			tte;
 	int			tts;
 	int			mm;
-	int			eat_count;
-	int			dead;
-	long int	prev_meal;
-	long int	inception;
+	int			eat_count;		// Potentially useless, use mm instead
+	int			dead;			// Cover with mutex (death_mutex?)
+	long int	prev_meal;		// Cover with mutex
+	long int	inception;		// Potentially useless
 	t_fork		*r_utensil;
 	t_fork		*l_utensil;
 	pthread_mutex_t	*death_mutex;

@@ -143,6 +143,16 @@ pthread_t	*phacilitate(t_philosopher *phils, int philc)
 	return (threads);
 }
 
+void	killall(t_philosopher *phils, int philc)
+{
+	while (--philc >= 0)
+	{
+		pthread_mutex_lock(phils[philc].death_mutex);
+		phils[philc].dead = 1;
+		pthread_mutex_unlock(phils[philc].death_mutex);
+	}
+}
+
 // Arguments: philno, ttd, tte, tts, max_meals
 int	main(int argc, char *argv[])
 {
@@ -150,13 +160,33 @@ int	main(int argc, char *argv[])
 	t_philosopher	*phils;
 	pthread_t		*threads;
 	unsigned int	i;
+	long int		start_time;
 
-	if (parse_args(argc, argv, args))
+	if (parse_args(argc, argv, args))		// TODO Check for 0 values.
 		return (22);
 	if (argc == 5)
 		args[max_meals] = 0;
 	phils = phinitialize(args);
+	start_time = get_time_in_ms();
 	threads = phacilitate(phils, args[no_of_phils]);
+
+	// Monitor threads. Extract to own function
+	while(1)
+	{
+		i = 0;
+		while (i < args[no_of_phils] - 1)
+		{
+			if (phils[i].prev_meal > get_time_in_ms() - args[time_to_die])	// TODO MUTEX
+			{
+				killall(phils, args[no_of_phils]);
+				break ;
+			}
+			// TODO: Printings
+		}	
+		usleep(SLEEP_CYCLE);
+	}
+
+	// Ending. Joining is probably unnecessary. Could detach threads and skip this altogether
 	if (threads != NULL)
 	{
 		i = 0;
