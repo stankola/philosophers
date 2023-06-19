@@ -24,23 +24,20 @@ t_philosopher	*philosophize(t_philosopher *phil)
 	void		(*actions[3]) (t_philosopher *) = {deep_think, think, eat};
 	int			i;
 	static volatile int	death = 0;
-	long int wait_time = 0;
 
-	phil->prev_meal = get_time_in_ms();
+	phil->prev_meal = get_time_in_us();
 	i = phil->id % 2;
 	while (! phil->dead)
 	{
 		actions[i](phil);
 		if ((i + 1) % 3 == 0 && ! phil->dead && phil->mm != 0 && ! --phil->mm)
 			return (phil);
-		wait_time = get_time_in_ms();
 		pthread_mutex_lock(phil->death_mutex);
 		if (death)
 		{
 			pthread_mutex_unlock(phil->death_mutex);
 			return (phil);
 		}
-		printf("%d Waited on death_mutex for %ld ms\n", phil->id, get_time_in_ms() - wait_time);
 		pthread_mutex_unlock(phil->death_mutex);
 		i = (i + 1) % 3;
 	}
@@ -84,7 +81,6 @@ int	finitialize(t_fork *f)
 
 t_philosopher	*phinitialize(unsigned int a[])
 {
-	// What if tts + tte > ttd ??
 	t_fork			*fs;
 	t_philosopher	*ps;
 	pthread_mutex_t	*death_mutex;
@@ -166,6 +162,9 @@ int	main(int argc, char *argv[])
 		return (22);
 	if (argc == 5)
 		args[max_meals] = 0;
+	args[time_to_die] *= 1000;
+	args[time_to_eat] *= 1000;
+	args[time_to_sleep] *= 1000;
 	phils = phinitialize(args);
 	start_time = get_time_in_ms();
 	threads = phacilitate(phils, args[no_of_phils]);

@@ -13,7 +13,8 @@
 # define PHILO_H
 # include <pthread.h>
 # include <sys/time.h>
-# define SLEEP_CYCLE 100	// waiting increment size in microseconds
+# define SLEEP_CYCLE 50	// waiting increment size in microseconds
+# define DYING_THRESHOLD 300 // Threshold in microseconds that a philosopher is allowed to go over his time to die
 
 /* Arguments:
 number_of_philosophers
@@ -30,6 +31,21 @@ enum e_args
 	time_to_eat = 2,
 	time_to_sleep = 3,
 	max_meals = 4
+};
+
+enum e_mutex_indices
+{
+	DEATH_MUTEX = 0,
+	PRINT_MUTEX = 1
+};
+
+enum e_print_cases
+{
+	EAT,
+	SLEEP,
+	FORK_TAKE,
+	DIE,
+	THINK
 };
 
 typedef struct s_fork
@@ -53,6 +69,7 @@ typedef struct s_philosopher
 	t_fork		*r_utensil;
 	t_fork		*l_utensil;
 	pthread_mutex_t	*death_mutex;
+//	pthread_mutex_t	*mutexes;
 }	t_philosopher;
 
 long int	get_time_in_us();
@@ -70,8 +87,6 @@ void		think(t_philosopher *phil);
 void		deep_think(t_philosopher *phil);
 
 void		take_fork(t_philosopher *phil, t_fork *f);
-
-//void	take_fork(t_fork *f);
 
 void		drop_fork(t_fork *f);
 
