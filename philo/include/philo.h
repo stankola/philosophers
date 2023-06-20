@@ -13,7 +13,7 @@
 # define PHILO_H
 # include <pthread.h>
 # include <sys/time.h>
-# define SLEEP_CYCLE 50	// waiting increment size in microseconds
+# define SLEEP_CYCLE 250	// waiting increment size in microseconds
 
 /* Arguments:
 number_of_philosophers
@@ -88,5 +88,7 @@ void		deep_think(t_philosopher *phil);
 void		take_fork(t_philosopher *phil, t_fork *f);
 
 void		drop_fork(t_fork *f);
+
+int			should_die(t_philosopher *phil);
 
 #endif

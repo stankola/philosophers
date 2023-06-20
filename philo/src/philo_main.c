@@ -33,18 +33,19 @@ t_philosopher	*philosophize(t_philosopher *phil)
 		actions[i](phil);
 		if ((i + 1) % 3 == 0 && ! phil->dead && phil->mm != 0 && ! --phil->mm)
 			return (phil);
-		pthread_mutex_lock(phil->mutexes);
-		if (death)
-		{
-			pthread_mutex_unlock(phil->mutexes);
-			return (phil);
-		}
-		pthread_mutex_unlock(phil->mutexes);
+		should_die(phil);
+//		pthread_mutex_lock(phil->mutexes);
+//		if (death)
+//		{
+//			pthread_mutex_unlock(phil->mutexes);
+//			return (phil);
+//		}
+//		pthread_mutex_unlock(phil->mutexes);
 		i = (i + 1) % 3;
 	}
-	pthread_mutex_lock(phil->mutexes);
-	death = 1;
-	pthread_mutex_unlock(phil->mutexes);
+//	pthread_mutex_lock(phil->mutexes);
+//	death = 1;
+//	pthread_mutex_unlock(phil->mutexes);
 	return (phil);
 }
 
