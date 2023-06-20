@@ -13,6 +13,7 @@
 #include <stdio.h>
 #include <sys/time.h>
 #include <pthread.h>
+#include <stdlib.h>
 #include "philo.h"
 
 /*
@@ -24,24 +25,34 @@ timestamp_in_ms X is thinking
 timestamp_in_ms X died
 */
 
-void	phrint(int print_case, pthread_mutex_t *print_mutex, int id, long int time)
+void	phrint(int print_case, t_philosopher *phil)
 {
-	pthread_mutex_lock(print_mutex);
+	long int	time;
+
+	time = get_time_in_ms() - phil->inception;
+	pthread_mutex_lock(&phil->mutexes[PRINT_MUTEX_I]);
 	if (print_case == EAT)
-		printf("%ld %d is eating\n", time, id);
+		printf("%ld %d is eating\n", time, phil->id);
 	if (print_case == SLEEP)
-		printf("%ld %d is sleeping\n", time, id);
+		printf("%ld %d is sleeping\n", time, phil->id);
 	if (print_case == FORK_TAKE)
-		printf("%ld %d has taken a fork\n", time, id);
+		printf("%ld %d has taken a fork\n", time, phil->id);
 	if (print_case == DIE)
-		printf("%ld %d died\n", time, id);
+		printf("%ld %d died\n", time, phil->id);
 	if (print_case == THINK)
-		printf("%ld %d is thinking\n", time, id);
-	pthread_mutex_unlock(print_mutex);
+		printf("%ld %d is thinking\n", time, phil->id);
+	pthread_mutex_unlock(&phil->mutexes[PRINT_MUTEX_I]);
 }
 
 int	should_die(t_philosopher *phil)
 {
+	pthread_mutex_lock(phil->mutexes);
+	if (*phil->death)
+	{
+		pthread_mutex_unlock(phil->mutexes);
+		return (-1);
+	}
+	pthread_mutex_unlock(phil->mutexes);
 	if (get_time_in_us() - (phil->prev_meal + phil->ttd) > 0)
 	{
 		printf("Distance from death %ld\n", get_time_in_us() - phil->prev_meal - phil->ttd);
@@ -52,8 +63,11 @@ int	should_die(t_philosopher *phil)
 
 void	die(t_philosopher *phil)
 {
+	pthread_mutex_lock(phil->mutexes);
 	phil->dead = 1;
-	printf("%ld %d died\n", get_time_in_ms() - phil->inception, phil->id);
+	*phil->death = 1;
+	pthread_mutex_unlock(phil->mutexes);
+	phrint(DIE, phil);
 }
 
 void	eat(t_philosopher *phil)
@@ -70,12 +84,12 @@ void	eat(t_philosopher *phil)
 		if(! phil->dead)
 			take_fork(phil, phil->r_utensil);
 	}
-	if (should_die(phil))
+	if (should_die(phil) > 0)
 		die(phil);
 	if(! phil->dead)
 	{
 		phil->prev_meal = get_time_in_us();
-		printf("%ld %d is eating\n", get_time_in_ms() - phil->inception, phil->id);
+		phrint(EAT, phil);
 		while (!phil->dead && (get_time_in_us() - phil->tte) < phil->prev_meal)
 			usleep(SLEEP_CYCLE);
 	}
@@ -88,13 +102,7 @@ void	think(t_philosopher *phil)
 	long int	think_start;
 
 	think_start = get_time_in_us();
-	printf("%ld %d is thinking\n", get_time_in_ms() - phil->inception, phil->id);
-//	while (!phil->dead && (get_time_in_us() - (phil->ttd - phil->tte - phil->tts)) < think_start)
-//	{
-//		usleep(SLEEP_CYCLE);
-//		if (should_die(phil))
-//			die(phil);
-//	}
+	phrint(THINK, phil);
 }
 
 // ie. sleep
@@ -103,11 +111,11 @@ void	deep_think(t_philosopher *phil)
 	long int	sleep_start;
 
 	sleep_start = get_time_in_us();
-	printf("%ld %d is sleeping\n", sleep_start / 1000 - phil->inception, phil->id);
+	phrint(SLEEP, phil);
 	while (!phil->dead && (get_time_in_us() - phil->tts) < sleep_start)
 	{
 		usleep(SLEEP_CYCLE);
-		if (should_die(phil))
+		if (should_die(phil) > 0)
 			die(phil);
 	}
 }
@@ -121,14 +129,13 @@ void	take_fork(t_philosopher *phil, t_fork *f)
 		{
 			f->taken = 1;
 			pthread_mutex_lock(&(f->fork_mutex));
-			printf("%ld %d has taken a fork\n",
-				get_time_in_ms() - phil->inception, phil->id);
+			phrint(FORK_TAKE, phil);
 			pthread_mutex_unlock(&(f->grab_mutex));
 			return ;
 		}
 		pthread_mutex_unlock(&(f->grab_mutex));
 		usleep(SLEEP_CYCLE);
-		if (should_die(phil))
+		if (should_die(phil) > 0)
 			die(phil);
 	}
 }

@@ -25,6 +25,7 @@ t_philosopher	*philosophize(t_philosopher *phil)
 	int			i;
 	static volatile int	death = 0;
 
+	phil->death = &death;
 	phil->prev_meal = get_time_in_us();
 	i = phil->id % 2;
 	while (! phil->dead)
@@ -32,23 +33,23 @@ t_philosopher	*philosophize(t_philosopher *phil)
 		actions[i](phil);
 		if ((i + 1) % 3 == 0 && ! phil->dead && phil->mm != 0 && ! --phil->mm)
 			return (phil);
-		pthread_mutex_lock(phil->death_mutex);
+		pthread_mutex_lock(phil->mutexes);
 		if (death)
 		{
-			pthread_mutex_unlock(phil->death_mutex);
+			pthread_mutex_unlock(phil->mutexes);
 			return (phil);
 		}
-		pthread_mutex_unlock(phil->death_mutex);
+		pthread_mutex_unlock(phil->mutexes);
 		i = (i + 1) % 3;
 	}
-	pthread_mutex_lock(phil->death_mutex);
+	pthread_mutex_lock(phil->mutexes);
 	death = 1;
-	pthread_mutex_unlock(phil->death_mutex);
+	pthread_mutex_unlock(phil->mutexes);
 	return (phil);
 }
 
 int	phallocate(t_fork **utensils, t_philosopher **phils, unsigned int args[],
-	pthread_mutex_t **death_mutex)
+	pthread_mutex_t **mutexes)
 {
 	*phils = malloc(sizeof(t_philosopher) * args[no_of_phils]);
 	if (*phils == NULL)
@@ -59,14 +60,15 @@ int	phallocate(t_fork **utensils, t_philosopher **phils, unsigned int args[],
 		free(*phils);
 		return (1);
 	}
-	*death_mutex = malloc(sizeof(pthread_mutex_t));
-	if (*death_mutex == NULL)
+	*mutexes = malloc(sizeof(pthread_mutex_t) * 2);
+	if (*mutexes == NULL)
 	{
 		free(*utensils);
 		free(*phils);
 		return (1);
 	}
-	pthread_mutex_init(*death_mutex, NULL);	// could fail
+	pthread_mutex_init(*mutexes, NULL);	// could fail
+	pthread_mutex_init(&((*mutexes)[PRINT_MUTEX_I]), NULL);	// could fail
 	return (0);
 }
 
@@ -83,11 +85,11 @@ t_philosopher	*phinitialize(unsigned int a[])
 {
 	t_fork			*fs;
 	t_philosopher	*ps;
-	pthread_mutex_t	*death_mutex;
+	pthread_mutex_t	*mutexes;
 	long int		now;
 	unsigned int	i;
 
-	if (phallocate(&fs, &ps, a, &death_mutex))
+	if (phallocate(&fs, &ps, a, &mutexes))
 		return (NULL);
 	now = get_time_in_ms();
 	i = 0;
@@ -95,11 +97,11 @@ t_philosopher	*phinitialize(unsigned int a[])
 	{
 		finitialize(&fs[i]); // might fail
 		ps[i] = (t_philosopher){i + 1, a[time_to_die], a[time_to_eat],
-			a[time_to_sleep], a[max_meals], 0, 0, 0, now, &fs[i], &fs[i - 1], death_mutex};
+			a[time_to_sleep], a[max_meals], 0, 0, 0, now, &fs[i], &fs[i - 1], NULL, mutexes};
 	}
 	finitialize(&fs[0]); // might fail
 	ps[0] = (t_philosopher){1, a[time_to_die], a[time_to_eat], a[time_to_sleep],
-		a[max_meals], 0, 0, 0, now, &fs[0], &fs[a[no_of_phils] - 1], death_mutex};
+		a[max_meals], 0, 0, 0, now, &fs[0], &fs[a[no_of_phils] - 1], NULL, mutexes};
 	return (ps);
 }
 
@@ -114,7 +116,7 @@ void	phree(t_philosopher *phil, int philc)
 		pthread_mutex_destroy(&phil[i].r_utensil->grab_mutex);
 		i++;
 	}
-	pthread_mutex_destroy(phil->death_mutex);
+	pthread_mutex_destroy(phil->mutexes);
 	if (phil->r_utensil != NULL)
 		free(phil->r_utensil);
 	phil->l_utensil = NULL;

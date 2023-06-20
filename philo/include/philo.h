@@ -14,7 +14,6 @@
 # include <pthread.h>
 # include <sys/time.h>
 # define SLEEP_CYCLE 50	// waiting increment size in microseconds
-# define DYING_THRESHOLD 300 // Threshold in microseconds that a philosopher is allowed to go over his time to die
 
 /* Arguments:
 number_of_philosophers
@@ -35,8 +34,8 @@ enum e_args
 
 enum e_mutex_indices
 {
-	DEATH_MUTEX = 0,
-	PRINT_MUTEX = 1
+	DEATH_MUTEX_I = 0,
+	PRINT_MUTEX_I = 1
 };
 
 enum e_print_cases
@@ -68,8 +67,8 @@ typedef struct s_philosopher
 	long int	inception;
 	t_fork		*r_utensil;
 	t_fork		*l_utensil;
-	pthread_mutex_t	*death_mutex;
-//	pthread_mutex_t	*mutexes;
+	volatile int	*death;
+	pthread_mutex_t	*mutexes;
 }	t_philosopher;
 
 long int	get_time_in_us();
