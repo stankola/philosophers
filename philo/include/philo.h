@@ -1,4 +1,4 @@
-/* ************************************************************************** */
+/******************************************************************************/
 /*                                                                            */
 /*                                                        :::      ::::::::   */
 /*   philo.h                                            :+:      :+:    :+:   */
@@ -6,9 +6,10 @@
 /*   By: tsankola <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/06/16 14:26:41 by tsankola          #+#    #+#             */
-/*   Updated: 2023/06/16 14:26:42 by tsankola         ###   ########.fr       */
+/*   Updated: 2023/06/26 21:19:42 by tsankola         ###   ########.fr       */
 /*                                                                            */
-/* ************************************************************************** */
+/******************************************************************************/
+
 #ifndef PHILO_H
 # define PHILO_H
 # include <pthread.h>
@@ -85,7 +86,7 @@ void		think(t_philosopher *phil);
 
 void		deep_think(t_philosopher *phil);
 
-void		take_fork(t_philosopher *phil, t_fork *f);
+int			take_fork(t_philosopher *phil, t_fork *f);
 
 void		drop_fork(t_fork *f);
 
