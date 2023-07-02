@@ -1,19 +1,25 @@
 /******************************************************************************/
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   philo.h                                            :+:      :+:    :+:   */
+/*   philo_bonus.h                                      :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: tsankola <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/06/16 14:26:41 by tsankola          #+#    #+#             */
-/*   Updated: 2023/07/03 00:03:39 by tsankola         ###   ########.fr       */
+/*   Updated: 2023/07/03 00:20:53 by tsankola         ###   ########.fr       */
 /*                                                                            */
 /******************************************************************************/
 
 #ifndef PHILO_H
 # define PHILO_H
 # include <pthread.h>
-# define SLEEP_CYCLE 250	// waiting increment size in microseconds
+# include <sys/time.h>
+# include <semaphore.h>
+# define DEATH_SEMAPHORE_NAME "Morty"
+# define GRAB_SEMAPHORE_NAME "Grabby"
+# define FORK_SEMAPHORE_NAME "Forky"
+# define PRINT_SEMAPHORE_NAME "Phrinty"
+# define SLEEP_CYCLE 250
 
 /* Arguments:
 number_of_philosophers
@@ -32,12 +38,6 @@ enum e_args
 	max_meals = 4
 };
 
-enum e_mutex_indices
-{
-	DEATH_MUTEX_I = 0,
-	PRINT_MUTEX_I = 1
-};
-
 enum e_print_cases
 {
 	EAT,
@@ -46,13 +46,6 @@ enum e_print_cases
 	DIE,
 	THINK
 };
-
-typedef struct s_fork
-{
-	volatile int	taken;
-	pthread_mutex_t	grab_mutex;
-	pthread_mutex_t	fork_mutex;
-}	t_fork;
 
 typedef struct s_philosopher
 {
@@ -65,10 +58,7 @@ typedef struct s_philosopher
 	int				dead;
 	long int		prev_meal;
 	long int		inception;
-	t_fork			*r_utensil;
-	t_fork			*l_utensil;
 	volatile int	*death;
-	pthread_mutex_t	*mutexes;
 }	t_philosopher;
 
 long int	get_time_in_us();
@@ -82,11 +72,5 @@ void		eat(t_philosopher *phil);
 void		think(t_philosopher *phil);
 
 void		deep_think(t_philosopher *phil);
-
-int			take_fork(t_philosopher *phil, t_fork *f);
-
-void		drop_fork(t_fork *f);
-
-int			should_die(t_philosopher *phil);
 
 #endif
