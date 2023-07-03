@@ -6,7 +6,7 @@
 /*   By: tsankola <tsankola@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/06/27 19:56:11 by tsankola          #+#    #+#             */
-/*   Updated: 2023/07/03 18:06:02 by tsankola         ###   ########.fr       */
+/*   Updated: 2023/07/03 18:48:33 by tsankola         ###   ########.fr       */
 /*                                                                            */
 /******************************************************************************/
 
@@ -112,10 +112,8 @@ int	take_fork(t_philosopher *phil)
 			sem_post(grabby);
 			return (0);
 		}
-		if (f->taken == 0)
+		while (i < 2)
 		{
-			f->taken = 1;
-
 			pthread_mutex_lock(&(f->fork_mutex));
 			phrint(FORK_TAKE, phil);
 			sem_post(grabby);
