@@ -6,7 +6,7 @@
 /*   By: tsankola <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/06/16 17:05:24 by tsankola          #+#    #+#             */
-/*   Updated: 2023/06/27 11:40:32 by tsankola         ###   ########.fr       */
+/*   Updated: 2023/07/03 11:42:54 by tsankola         ###   ########.fr       */
 /*                                                                            */
 /******************************************************************************/
 
@@ -29,7 +29,17 @@ timestamp_in_ms X died
 void	phrint(int print_case, t_philosopher *phil)
 {
 	long int	time;
+// TODO: Implement this as thread. Mutex could be static that is initialized on
+// the first run. pthread_join should be called before calling this function to
+// ensure that printing stays in order. Therefore the philosopher struct should
+// contain a thread member
+//	static mutex_t printmutex;	// volatile unnecessary?   https://stackoverflow.com/questions/6837699/are-mutex-lock-functions-sufficient-without-volatile
 
+//	if (printmutex == NULL)
+//	{
+//		pthread_mutex_init(&printmutex, 0);	// Check return value
+//		return ;
+//	}
 	pthread_mutex_lock(&phil->mutexes[PRINT_MUTEX_I]);
 	time = get_time_in_ms() - phil->inception;
 	if (print_case == EAT)
@@ -50,6 +60,7 @@ void	phrint(int print_case, t_philosopher *phil)
 
 int	should_die(t_philosopher *phil)
 {
+	// TODO: Implement this as thread. Mutex could be static that is initialized on the first run.
 	pthread_mutex_lock(&phil->mutexes[DEATH_MUTEX_I]);
 	if (*phil->death)
 	{
