@@ -6,13 +6,12 @@
 /*   By: tsankola <tsankola@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/06/16 14:26:33 by tsankola          #+#    #+#             */
-/*   Updated: 2023/07/03 18:34:38 by tsankola         ###   ########.fr       */
+/*   Updated: 2023/07/03 18:51:51 by tsankola         ###   ########.fr       */
 /*                                                                            */
 /******************************************************************************/
 
 #include <unistd.h>
 #include <stdlib.h>
-#include <stdio.h>	// remove this??
 #include <pthread.h>
 #include <sys/time.h>
 #include "philo.h"
@@ -24,7 +23,7 @@ t_philosopher	*philosophize(t_philosopher *phil)
 {
 	void		(*actions[3]) (t_philosopher *) = {deep_think, think, eat};
 	int			i;
-	static volatile int	death;
+	static volatile int	death = 0;
 
 	phil->death = &death;
 	phil->prev_meal = get_time_in_us();
@@ -88,11 +87,11 @@ t_philosopher	*phinitialize(unsigned int a[])
 	{
 		finitialize(&fs[i]); // might fail
 		ps[i] = (t_philosopher){i + 1, a[time_to_die], a[time_to_eat],
-			a[time_to_sleep], a[max_meals], 0, 0, 0, now, &fs[i], &fs[i - 1], NULL, mutexes, 0};		// mouth is uninitialized, maybe ok
+			a[time_to_sleep], a[max_meals], 0, 0, 0, now, &fs[i], &fs[i - 1], NULL, mutexes};
 	}
 	finitialize(&fs[0]); // might fail
 	ps[0] = (t_philosopher){1, a[time_to_die], a[time_to_eat], a[time_to_sleep],
-		a[max_meals], 0, 0, 0, now, &fs[0], &fs[a[no_of_phils] - 1], NULL, mutexes, 0};				// mouth is uninitialized, maybe ok
+		a[max_meals], 0, 0, 0, now, &fs[0], &fs[a[no_of_phils] - 1], NULL, mutexes};
 	return (ps);
 }
 
@@ -140,9 +139,6 @@ int	main(int argc, char *argv[])
 	pthread_t		*threads;
 	unsigned int	i;
 
-	printf("there\n");
-	fprintf(stdout, "here\n");
-//	return (-2);
 	if (parse_args(argc, argv, args))
 		return (22);
 	if (argc == 5)

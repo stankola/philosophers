@@ -6,7 +6,7 @@
 /*   By: tsankola <tsankola@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/06/27 19:56:11 by tsankola          #+#    #+#             */
-/*   Updated: 2023/07/03 18:48:33 by tsankola         ###   ########.fr       */
+/*   Updated: 2023/07/03 19:20:00 by tsankola         ###   ########.fr       */
 /*                                                                            */
 /******************************************************************************/
 
@@ -96,33 +96,44 @@ int	wait_on_mutex(sem_t *semaphore, int *value)
 	return (ret_val);
 }
 
-int	take_fork(t_philosopher *phil)
+int	take_fork(t_philosopher *phil)	// I'm thinking fork is necessary here...
 {
 	sem_t		*grabby;
 	sem_t		*forky;
 	int			i;
 
-	i = 0;
-	while (! phil->dead)
+	i = -1;
+	grabby = sem_open(GRAB_SEMAPHORE_NAME, 0);
+	forky = sem_open(FORK_SEMAPHORE_NAME, 0);
+	sem_wait(grabby);
+	while (! phil->dead && ++i < 2)
 	{
-		grabby = sem_open(GRAB_SEMAPHORE_NAME, 0);
-		sem_wait(grabby);
 		if (should_die(phil))
 		{
 			sem_post(grabby);
+			sem_close(grabby);
 			return (0);
 		}
 		while (i < 2)
 		{
-			pthread_mutex_lock(&(f->fork_mutex));
+			sem_wait(forky);
 			phrint(FORK_TAKE, phil);
-			sem_post(grabby);
-			return (1);
 		}
-			sem_post(grabby);
+		sem_post(grabby);
 		usleep(SLEEP_CYCLE);
 	}
+	sem_close(grabby);
 	return (0);
+}
+
+void	drop_fork(t_philosopher *phil)
+{
+	sem_t	*forky;
+
+	forky = sem_open(FORK_SEMAPHORE_NAME, 0);
+	sem_post(forky);
+	sem_post(forky);
+	sem_close(forky);
 }
 
 void	eat(t_philosopher *phil)

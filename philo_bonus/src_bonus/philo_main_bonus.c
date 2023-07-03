@@ -6,7 +6,7 @@
 /*   By: tsankola <tsankola@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/06/16 14:26:33 by tsankola          #+#    #+#             */
-/*   Updated: 2023/07/03 18:40:53 by tsankola         ###   ########.fr       */
+/*   Updated: 2023/07/03 19:52:34 by tsankola         ###   ########.fr       */
 /*                                                                            */
 /******************************************************************************/
 
@@ -16,6 +16,7 @@
 #include <stdio.h>
 #include <pthread.h>
 #include <sys/time.h>
+#include <semaphore.h>
 #include "philo_bonus.h"
 
 // sleep
@@ -91,21 +92,18 @@ void	phree(t_philosopher *phil, int philc)
 	sem_unlink(GRAB_SEMAPHORE_NAME);
 }
 
-pthread_t	*phacilitate(t_philosopher *phils, int philc)
+pid_t	*phacilitate(t_philosopher *phils, int philc)
 {
-	pthread_t		*threads;
+	pid_t		*phids;
 	int				i;
 
-	threads = malloc(sizeof(pthread_t) * philc);
-	if (threads == NULL)
+	phids = malloc(sizeof(pid_t) * philc);
+	if (phids == NULL)
 		return (NULL);
 	i = -1;
 	while (++i < philc)
-	{
-		pthread_create(&threads[i], NULL, (void * (*)(void *))philosophize,
-			(void *)&phils[i]);
-	}
-	return (threads);
+		phids[i] = philosophize(&phils[i]);	// might fail
+	return (phids);
 }
 
 // Arguments: philno, ttd, tte, tts, max_meals
@@ -113,7 +111,7 @@ int	main(int argc, char *argv[])
 {
 	unsigned int	args[5];
 	t_philosopher	*phils;
-	pthread_t		*threads;
+	pid_t			*phids;
 	unsigned int	i;
 
 	if (parse_args(argc, argv, args))
@@ -124,12 +122,12 @@ int	main(int argc, char *argv[])
 	args[time_to_eat] *= 1000;
 	args[time_to_sleep] *= 1000;
 	phils = phinitialize(args);
-	threads = phacilitate(phils, args[no_of_phils]);
-	if (threads != NULL)
+	phids = phacilitate(phils, args[no_of_phils]);
+	if (phids != NULL)
 	{
 		i = 0;
 		while (i < args[no_of_phils])
-			pthread_join(threads[i++], NULL);
+			waitpid(phids[i], NULL, 0);
 	}
 	phree(phils, args[no_of_phils]);
 	return (0);
