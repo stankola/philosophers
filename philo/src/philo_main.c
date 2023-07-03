@@ -6,7 +6,7 @@
 /*   By: tsankola <tsankola@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/06/16 14:26:33 by tsankola          #+#    #+#             */
-/*   Updated: 2023/07/03 16:47:34 by tsankola         ###   ########.fr       */
+/*   Updated: 2023/07/03 18:34:38 by tsankola         ###   ########.fr       */
 /*                                                                            */
 /******************************************************************************/
 
@@ -24,7 +24,7 @@ t_philosopher	*philosophize(t_philosopher *phil)
 {
 	void		(*actions[3]) (t_philosopher *) = {deep_think, think, eat};
 	int			i;
-	static volatile int	death = 0;
+	static volatile int	death;
 
 	phil->death = &death;
 	phil->prev_meal = get_time_in_us();

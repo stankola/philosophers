@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   philo_main_bonus.c                                 :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: tsankola <marvin@42.fr>                    +#+  +:+       +#+        */
+/*   By: tsankola <tsankola@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/06/16 14:26:33 by tsankola          #+#    #+#             */
-/*   Updated: 2023/06/27 21:10:02 by tsankola         ###   ########.fr       */
+/*   Updated: 2023/07/03 18:40:53 by tsankola         ###   ########.fr       */
 /*                                                                            */
 /******************************************************************************/
 
@@ -21,23 +21,29 @@
 // sleep
 // think
 // eat
-t_philosopher	*philosophize(t_philosopher *phil)
+pid_t	*philosophize(t_philosopher *phil)
 {
 	void		(*actions[3]) (t_philosopher *) = {deep_think, think, eat};
-	int			i;
-	static volatile int	death = 0;
+	static volatile int	death;
+	int		i;
+	pid_t	pid;
 
-	phil->prev_meal = get_time_in_us();
-	i = phil->id % 2;
-	while (! phil->dead)
+	pid = fork();
+	if (pid == 0)
 	{
-		actions[i](phil);
-		if ((i + 1) % 3 == 0 && ! phil->dead && phil->mm != 0 && ! --phil->mm)
-			return (phil);
-		should_die(phil);
-		i = (i + 1) % 3;
+		phil->prev_meal = get_time_in_us();
+		i = phil->id % 2;
+		while (! phil->dead)
+		{
+			actions[i](phil);
+			if ((i + 1) % 3 == 0 && ! phil->dead && phil->mm != 0 && ! --phil->mm)
+				return (phil);
+			should_die(phil);
+			i = (i + 1) % 3;
+		}
+		exit(0);	// join running threads?
 	}
-	return (phil);
+	return (pid);
 }
 
 int	phallocate(t_philosopher **phils, unsigned int args[])
@@ -65,8 +71,10 @@ t_philosopher	*phinitialize(unsigned int a[])
 	}
 	ps[0] = (t_philosopher){1, a[time_to_die], a[time_to_eat], a[time_to_sleep],
 		a[max_meals], 0, 0, now, NULL};
-	sem_open(FORK_SEMAPHORE_NAME, 0);
-	sem_open(PRINT_SEMAPHORE_NAME, 0);
+	sem_open(GRAB_SEMAPHORE_NAME, O_CREAT | O_EXCL, 00660, 1); // O_EXCL shouldn't be strictly required here but I'll do it anyway
+	sem_open(PRINT_SEMAPHORE_NAME, O_CREAT | O_EXCL, 00660, 1);
+	sem_open(DEATH_SEMAPHORE_NAME, O_CREAT | O_EXCL, 00660, 1);
+	sem_open(FORK_SEMAPHORE_NAME,  O_CREAT | O_EXCL, 00660, a[no_of_phils]);
 	return (ps);
 }
 
@@ -74,7 +82,13 @@ void	phree(t_philosopher *phil, int philc)
 {
 	free(phil);
 	sem_close(sem_open(FORK_SEMAPHORE_NAME, 0));
+	sem_close(sem_open(DEATH_SEMAPHORE_NAME, 0));
 	sem_close(sem_open(PRINT_SEMAPHORE_NAME, 0));
+	sem_close(sem_open(GRAB_SEMAPHORE_NAME, 0));
+	sem_unlink(FORK_SEMAPHORE_NAME);
+	sem_unlink(DEATH_SEMAPHORE_NAME);
+	sem_unlink(PRINT_SEMAPHORE_NAME);
+	sem_unlink(GRAB_SEMAPHORE_NAME);
 }
 
 pthread_t	*phacilitate(t_philosopher *phils, int philc)

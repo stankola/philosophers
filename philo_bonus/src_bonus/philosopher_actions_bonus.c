@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   philosopher_actions_bonus.c                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: tsankola <marvin@42.fr>                    +#+  +:+       +#+        */
+/*   By: tsankola <tsankola@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/06/27 19:56:11 by tsankola          #+#    #+#             */
-/*   Updated: 2023/07/03 00:45:44 by tsankola         ###   ########.fr       */
+/*   Updated: 2023/07/03 18:06:02 by tsankola         ###   ########.fr       */
 /*                                                                            */
 /******************************************************************************/
 
@@ -99,24 +99,29 @@ int	wait_on_mutex(sem_t *semaphore, int *value)
 int	take_fork(t_philosopher *phil)
 {
 	sem_t		*grabby;
+	sem_t		*forky;
+	int			i;
 
+	i = 0;
 	while (! phil->dead)
 	{
 		grabby = sem_open(GRAB_SEMAPHORE_NAME, 0);
+		sem_wait(grabby);
 		if (should_die(phil))
 		{
-			pthread_mutex_unlock(&(f->grab_mutex));
+			sem_post(grabby);
 			return (0);
 		}
 		if (f->taken == 0)
 		{
 			f->taken = 1;
+
 			pthread_mutex_lock(&(f->fork_mutex));
 			phrint(FORK_TAKE, phil);
-			pthread_mutex_unlock(&(f->grab_mutex));
+			sem_post(grabby);
 			return (1);
 		}
-		pthread_mutex_unlock(&(f->grab_mutex));
+			sem_post(grabby);
 		usleep(SLEEP_CYCLE);
 	}
 	return (0);
