@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   philosopher_actions.c                              :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: tsankola <marvin@42.fr>                    +#+  +:+       +#+        */
+/*   By: tsankola <tsankola@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/06/16 17:05:24 by tsankola          #+#    #+#             */
-/*   Updated: 2023/07/03 11:42:54 by tsankola         ###   ########.fr       */
+/*   Updated: 2023/07/03 17:45:47 by tsankola         ###   ########.fr       */
 /*                                                                            */
 /******************************************************************************/
 
@@ -26,20 +26,22 @@ timestamp_in_ms X is thinking
 timestamp_in_ms X died
 */
 
-void	phrint(int print_case, t_philosopher *phil)
+struct	print_arguments {int print_case; t_philosopher *phil;};
+#include <time.h>
+//static void	mutex_print(int print_case, t_philosopher *phil)
+static void	*mutex_print(struct print_arguments *priarg)
 {
 	long int	time;
+	int print_case = priarg->print_case;
+	t_philosopher *phil = priarg->phil;
 // TODO: Implement this as thread. Mutex could be static that is initialized on
 // the first run. pthread_join should be called before calling this function to
 // ensure that printing stays in order. Therefore the philosopher struct should
 // contain a thread member
-//	static mutex_t printmutex;	// volatile unnecessary?   https://stackoverflow.com/questions/6837699/are-mutex-lock-functions-sufficient-without-volatile
+	clock_t start, end;
+	double cpu_time_used;
 
-//	if (printmutex == NULL)
-//	{
-//		pthread_mutex_init(&printmutex, 0);	// Check return value
-//		return ;
-//	}
+	start = clock();
 	pthread_mutex_lock(&phil->mutexes[PRINT_MUTEX_I]);
 	time = get_time_in_ms() - phil->inception;
 	if (print_case == EAT)
@@ -56,6 +58,33 @@ void	phrint(int print_case, t_philosopher *phil)
 	else if (print_case == THINK)
 		printf("%ld %d is thinking\n", time, phil->id);
 	pthread_mutex_unlock(&phil->mutexes[PRINT_MUTEX_I]);
+	end = clock();
+	cpu_time_used = ((double) (end - start)) / CLOCKS_PER_SEC;
+	printf("Printing took %f time\n", cpu_time_used);
+	free(priarg);
+	return (NULL);
+}
+
+#include <errno.h>	// should be moved up top if going this route.
+void	phrint(int print_case, t_philosopher *phil)
+{
+//	mutex_print(print_case, phil);	
+	struct print_arguments *priargs = malloc(sizeof(struct print_arguments));
+	
+	clock_t start, end;
+	double cpu_time_used;
+
+	*priargs = (struct print_arguments){print_case, phil};
+
+	int join = pthread_join(phil->mouth, NULL);	// needed to guarantee in-order printing
+	if (join == ESRCH)
+		printf("No thread with the ID thread could be found. ok!\n");
+	start = clock();
+	pthread_create(&phil->mouth, 0, (void * (*)(void*))mutex_print, (void *)priargs);
+	end = clock();
+	cpu_time_used = ((double) (end - start)) / CLOCKS_PER_SEC;
+	printf("Thread creation took %f time\n", cpu_time_used);
+//	pthread_detach(phil->mouth);		// could be used to optimize, but wouldn't be able to guarantee in-order printing
 }
 
 int	should_die(t_philosopher *phil)
@@ -118,7 +147,11 @@ void	eat(t_philosopher *phil)
 			phil->prev_meal = get_time_in_us();
 			phrint(EAT, phil);
 			while ((get_time_in_us() - phil->tte) < phil->prev_meal)
+			{
 				usleep(SLEEP_CYCLE);
+				if (should_die(phil))
+					break ;
+			}
 		}
 		drop_fork(phil->r_utensil);
 		drop_fork(phil->l_utensil);

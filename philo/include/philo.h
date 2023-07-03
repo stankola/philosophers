@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   philo.h                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: tsankola <marvin@42.fr>                    +#+  +:+       +#+        */
+/*   By: tsankola <tsankola@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/06/16 14:26:41 by tsankola          #+#    #+#             */
-/*   Updated: 2023/07/03 00:03:39 by tsankola         ###   ########.fr       */
+/*   Updated: 2023/07/03 16:10:49 by tsankola         ###   ########.fr       */
 /*                                                                            */
 /******************************************************************************/
 
@@ -69,6 +69,7 @@ typedef struct s_philosopher
 	t_fork			*l_utensil;
 	volatile int	*death;
 	pthread_mutex_t	*mutexes;
+	pthread_t		mouth;
 }	t_philosopher;
 
 long int	get_time_in_us();
