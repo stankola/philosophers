@@ -6,7 +6,7 @@
 /*   By: tsankola <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/07/04 18:17:38 by tsankola          #+#    #+#             */
-/*   Updated: 2023/07/04 18:17:44 by tsankola         ###   ########.fr       */
+/*   Updated: 2023/07/05 00:59:50 by tsankola         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,15 +16,6 @@
 #include <pthread.h>
 #include <stdlib.h>
 #include "philo.h"
-
-/*
-Any state change of a philosopher must be formatted as follows:
-timestamp_in_ms X has taken a fork
-timestamp_in_ms X is eating
-timestamp_in_ms X is sleeping
-timestamp_in_ms X is thinking
-timestamp_in_ms X died
-*/
 
 void	phrint(int print_case, t_philosopher *phil)
 {
@@ -74,16 +65,13 @@ void	deep_think(t_philosopher *phil)
 {
 	long int	sleep_start;
 
-	if (! phil->dead)
+	if (! should_die(phil))
 	{
 		sleep_start = get_time_in_us();
 		phrint(SLEEP, phil);
-		while ((get_time_in_us() - phil->tts) < sleep_start)
-		{
+		while ((get_time_in_us() - phil->tts) < sleep_start
+			&& !should_die(phil))
 			usleep(SLEEP_CYCLE);
-			if (should_die(phil))
-				return ;
-		}
 	}
 }
 
@@ -106,7 +94,8 @@ void	eat(t_philosopher *phil)
 		{
 			phil->prev_meal = get_time_in_us();
 			phrint(EAT, phil);
-			while (!should_die(phil) && (get_time_in_us() - phil->tte) < phil->prev_meal)
+			while (!should_die(phil)
+				&& (get_time_in_us() - phil->tte) < phil->prev_meal)
 				usleep(SLEEP_CYCLE);
 		}
 		drop_fork(phil->r_utensil);
