@@ -6,7 +6,7 @@
 /*   By: tsankola <tsankola@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/06/16 14:26:33 by tsankola          #+#    #+#             */
-/*   Updated: 2023/07/03 18:51:51 by tsankola         ###   ########.fr       */
+/*   Updated: 2023/07/04 18:15:27 by tsankola         ###   ########.fr       */
 /*                                                                            */
 /******************************************************************************/
 
@@ -14,6 +14,7 @@
 #include <stdlib.h>
 #include <pthread.h>
 #include <sys/time.h>
+#include <errno.h>
 #include "philo.h"
 
 // sleep
@@ -35,42 +36,74 @@ t_philosopher	*philosophize(t_philosopher *phil)
 			return (phil);
 		i = (i + 1) % 3;
 	}
+	phil->death = NULL;
 	return (phil);
 }
 
-int	phallocate(t_fork **utensils, t_philosopher **phils, unsigned int args[],
+// Pointers might point to unallocated memory at the end but the caller should
+// know not to use them from the return value
+static int	phallocate(t_fork **utensils, t_philosopher **phils, unsigned int args[],
 	pthread_mutex_t **mutexes)
 {
 	*phils = malloc(sizeof(t_philosopher) * args[no_of_phils]);
 	if (*phils == NULL)
-		return (1);
+		return (-1);
 	*utensils = malloc(sizeof(t_fork) * args[no_of_phils]);
 	if (*utensils == NULL)
 	{
 		free(*phils);
-		return (1);
+		return (-1);
 	}
 	*mutexes = malloc(sizeof(pthread_mutex_t) * 2);
 	if (*mutexes == NULL)
 	{
 		free(*utensils);
 		free(*phils);
-		return (1);
+		return (-1);
 	}
-	pthread_mutex_init(*mutexes, NULL);	// could fail
-	pthread_mutex_init(&((*mutexes)[PRINT_MUTEX_I]), NULL);	// could fail
+	if (pthread_mutex_init(*mutexes, NULL)
+		|| pthread_mutex_init(&((*mutexes)[PRINT_MUTEX_I]), NULL))
+	{
+		free(*utensils);
+		free(*phils);
+		free(*mutexes);
+		return (-1);
+	}
 	return (0);
 }
 
-int	finitialize(t_fork *f)
+// A neater way would be to take a **ptr and assign it a NULL value at the end
+// but this will do for this exercise.
+// pthread_mutex_destroy might 
+static void	phree(t_philosopher *phils, int philc)
 {
-	f->taken = 0;
-	if (pthread_mutex_init(&f->fork_mutex, NULL) != 0
-		|| pthread_mutex_init(&f->grab_mutex, NULL) != 0)
-		return (0);
-	return (1);
+	int	i;
+
+	i = 0;
+	while (i < philc)
+	{
+		pthread_mutex_destroy(&(phils + i)->r_utensil->fork_mutex);
+		pthread_mutex_destroy(&(phils + i)->r_utensil->grab_mutex);
+		i++;
+	}
+	pthread_mutex_destroy(&phils->mutexes[DEATH_MUTEX_I]);
+	pthread_mutex_destroy(&phils->mutexes[PRINT_MUTEX_I]);
+	if (phils->r_utensil != NULL)
+		free(phils->r_utensil);
+	free(phils->mutexes);
+	free(phils);
 }
 
+static int	finitialize(t_fork *f)
+{
+	f->taken = 0;
+	if (pthread_mutex_init(&f->fork_mutex, NULL)
+		|| pthread_mutex_init(&f->grab_mutex, NULL))
+		return (-1);
+	return (0);
+}
+
+#include <stdio.h>
 t_philosopher	*phinitialize(unsigned int a[])
 {
 	t_fork			*fs;
@@ -84,34 +117,21 @@ t_philosopher	*phinitialize(unsigned int a[])
 	now = get_time_in_ms();
 	i = 0;
 	while (++i < a[no_of_phils])
+		ps[i] = (t_philosopher){i + 1, a[ttd], a[tte], a[tts], a[max_meals],
+			0, 0, 0, now, &fs[i], &fs[i - 1], NULL, mutexes};
+	ps[0] = (t_philosopher){1, a[ttd], a[tte], a[tts], a[max_meals],
+		0, 0, 0, now, &fs[0], &fs[a[no_of_phils] - 1], NULL, mutexes};
+	while (i >= 0)
 	{
-		finitialize(&fs[i]); // might fail
-		ps[i] = (t_philosopher){i + 1, a[time_to_die], a[time_to_eat],
-			a[time_to_sleep], a[max_meals], 0, 0, 0, now, &fs[i], &fs[i - 1], NULL, mutexes};
+		if (finitialize(&fs[i]))
+		{
+			phree(ps, a[no_of_phils]);
+			return (NULL);
+		}
+		if (i == 0)
+			break ;
 	}
-	finitialize(&fs[0]); // might fail
-	ps[0] = (t_philosopher){1, a[time_to_die], a[time_to_eat], a[time_to_sleep],
-		a[max_meals], 0, 0, 0, now, &fs[0], &fs[a[no_of_phils] - 1], NULL, mutexes};
 	return (ps);
-}
-
-void	phree(t_philosopher *phil, int philc)
-{
-	int	i;
-
-	i = 0;
-	while (i < philc)
-	{
-		pthread_mutex_destroy(&phil[i].r_utensil->fork_mutex);
-		pthread_mutex_destroy(&phil[i].r_utensil->grab_mutex);
-		i++;
-	}
-	pthread_mutex_destroy(phil->mutexes);
-	if (phil->r_utensil != NULL)
-		free(phil->r_utensil);
-	phil->l_utensil = NULL;
-	phil->r_utensil = NULL;
-	free(phil);
 }
 
 pthread_t	*phacilitate(t_philosopher *phils, int philc)
@@ -131,7 +151,7 @@ pthread_t	*phacilitate(t_philosopher *phils, int philc)
 	return (threads);
 }
 
-// Arguments: philno, ttd, tte, tts, max_meals
+// Arguments: no_of_phils, ttd, tte, tts, max_meals
 int	main(int argc, char *argv[])
 {
 	unsigned int	args[5];
@@ -139,14 +159,16 @@ int	main(int argc, char *argv[])
 	pthread_t		*threads;
 	unsigned int	i;
 
-	if (parse_args(argc, argv, args))
+	fprintf(stderr, "jep");
+	if (parse_args(argc, argv, args) || args[no_of_phils] == 0
+		|| (argc == 6 && args[max_meals] == 0))
 		return (22);
 	if (argc == 5)
-		args[max_meals] = 0;	//TODO: Consider 0 as a command line argument. Shouldn't even start?
-	args[time_to_die] *= 1000;
-	args[time_to_eat] *= 1000;
-	args[time_to_sleep] *= 1000;
+		args[max_meals] = 0;
 	phils = phinitialize(args);
+	fprintf(stderr, "dep");
+	if (phils == NULL)
+		return (-1);
 	threads = phacilitate(phils, args[no_of_phils]);
 	if (threads != NULL)
 	{

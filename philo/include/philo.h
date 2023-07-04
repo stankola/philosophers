@@ -1,34 +1,26 @@
-/******************************************************************************/
+/* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
 /*   philo.h                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: tsankola <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2023/06/16 14:26:41 by tsankola          #+#    #+#             */
-/*   Updated: 2023/07/03 00:03:39 by tsankola         ###   ########.fr       */
+/*   Created: 2023/07/04 18:18:03 by tsankola          #+#    #+#             */
+/*   Updated: 2023/07/04 18:18:04 by tsankola         ###   ########.fr       */
 /*                                                                            */
-/******************************************************************************/
+/* ************************************************************************** */
 
 #ifndef PHILO_H
 # define PHILO_H
 # include <pthread.h>
-# define SLEEP_CYCLE 250	// waiting increment size in microseconds
+# define SLEEP_CYCLE 250	// sleeping period in microseconds
 
-/* Arguments:
-number_of_philosophers
-time_to_die
-time_to_eat
-time_to_sleep
-[number_of_times_each_philosopher_must_eat]
-Let valid values belong to the range [0,UINT_MAX]
-*/
-enum e_args
+enum e_arg_indices
 {
 	no_of_phils = 0,
-	time_to_die = 1,
-	time_to_eat = 2,
-	time_to_sleep = 3,
+	ttd = 1,
+	tte = 2,
+	tts = 3,
 	max_meals = 4
 };
 

@@ -1,14 +1,14 @@
-/******************************************************************************/
+/* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
 /*   philosopher_actions.c                              :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: tsankola <tsankola@student.42.fr>          +#+  +:+       +#+        */
+/*   By: tsankola <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2023/06/16 17:05:24 by tsankola          #+#    #+#             */
-/*   Updated: 2023/07/03 18:56:14 by tsankola         ###   ########.fr       */
+/*   Created: 2023/07/04 18:17:38 by tsankola          #+#    #+#             */
+/*   Updated: 2023/07/04 18:17:44 by tsankola         ###   ########.fr       */
 /*                                                                            */
-/******************************************************************************/
+/* ************************************************************************** */
 
 #include <unistd.h>
 #include <stdio.h>
@@ -50,7 +50,6 @@ void	phrint(int print_case, t_philosopher *phil)
 
 int	should_die(t_philosopher *phil)
 {
-	// TODO: Implement this as thread. Mutex could be static that is initialized on the first run.
 	pthread_mutex_lock(&phil->mutexes[DEATH_MUTEX_I]);
 	if (*phil->death)
 	{
