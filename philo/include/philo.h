@@ -15,6 +15,7 @@
 # include <pthread.h>
 # define SLEEP_CYCLE 500	// sleeping period in microseconds
 # define FORK_SLEEP_CYCLE 200
+# define BUFFER_ENTRIES_PER_PHILOSOPHER 5
 
 enum e_arg_indices
 {
@@ -63,6 +64,14 @@ typedef struct s_philosopher
 	volatile int	*death;
 	pthread_mutex_t	*mutexes;
 }	t_philosopher;
+
+typedef struct s_print_buffer
+{
+	volatile int	**buffer;		// long int ?
+	volatile int	buffer_reader;
+	volatile int	buffer_writer;
+	pthread_mutex_t	mutex;
+}	t_print_buffer;
 
 long int	get_time_in_us(void);
 

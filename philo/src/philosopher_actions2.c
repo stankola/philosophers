@@ -73,7 +73,9 @@ void	phrint(int print_case, t_philosopher *phil)
 	time = (get_time_in_ms() - phil->inception);
 	pthread_mutex_lock(&phil->mutexes[PRINT_MUTEX_I]);
 	if (print_case == DIE)
+	{
 		printf("%ld %d died\n", time, phil->id);
+	}
 	else
 	{
 		pthread_mutex_lock(&phil->mutexes[DEATH_MUTEX_I]);
