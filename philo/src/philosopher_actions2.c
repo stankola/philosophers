@@ -62,18 +62,25 @@ void	phrint(int print_case, t_philosopher *phil)
 {
 	long int	time;
 
-	pthread_mutex_lock(&phil->mutexes[PRINT_MUTEX_I]);
 	time = get_time_in_ms() - phil->inception;
-	if (print_case == EAT)
-		printf("%ld %d is eating\n", time, phil->id);
-	else if (print_case == SLEEP)
-		printf("%ld %d is sleeping\n", time, phil->id);
-	else if (print_case == FORK_TAKE)
-		printf("%ld %d has taken a fork\n", time, phil->id);
-	else if (print_case == DIE)
+	pthread_mutex_lock(&phil->mutexes[PRINT_MUTEX_I]);
+	if (print_case == DIE)
 		printf("%ld %d died\n", time, phil->id);
-	else if (print_case == THINK)
-		printf("%ld %d is thinking\n", time, phil->id);
+	else
+	{
+		pthread_mutex_lock(&phil->mutexes[DEATH_MUTEX_I]);
+		if (*phil->death)
+			;
+		else if (print_case == EAT)
+			printf("%ld %d is eating\n", time, phil->id);
+		else if (print_case == SLEEP)
+			printf("%ld %d is sleeping\n", time, phil->id);
+		else if (print_case == FORK_TAKE)
+			printf("%ld %d has taken a fork\n", time, phil->id);
+		else if (print_case == THINK)
+			printf("%ld %d is thinking\n", time, phil->id);
+		pthread_mutex_unlock(&phil->mutexes[DEATH_MUTEX_I]);
+	}
 	pthread_mutex_unlock(&phil->mutexes[PRINT_MUTEX_I]);
 }
 
