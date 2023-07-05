@@ -63,9 +63,9 @@ typedef struct s_philosopher
 	pthread_mutex_t	*mutexes;
 }	t_philosopher;
 
-long int	get_time_in_us();
+long int	get_time_in_us(void);
 
-long int	get_time_in_ms();
+long int	get_time_in_ms(void);
 
 int			parse_args(int argc, char *argv[], unsigned int args[]);
 
@@ -79,6 +79,10 @@ int			take_fork(t_philosopher *phil, t_fork *f);
 
 void		drop_fork(t_fork *f);
 
+pthread_t	*phacilitate(t_philosopher *phils, int philc);
+
 int			should_die(t_philosopher *phil);
+
+void		phrint(int print_case, t_philosopher *phil);
 
 #endif

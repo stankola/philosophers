@@ -17,29 +17,6 @@
 #include <errno.h>
 #include "philo.h"
 
-// sleep
-// think
-// eat
-t_philosopher	*philosophize(t_philosopher *phil)
-{
-	void		(*actions[3]) (t_philosopher *) = {deep_think, think, eat};
-	int			i;
-	static volatile int	death = 0;
-
-	phil->death = &death;
-	i = phil->id % 2;
-	phil->prev_meal = get_time_in_us();
-	while (! phil->dead)
-	{
-		actions[i](phil);
-		if ((i + 1) % 3 == 0 && ! phil->dead && phil->mm != 0 && ! --phil->mm)
-			return (phil);
-		i = (i + 1) % 3;
-	}
-	phil->death = NULL;
-	return (phil);
-}
-
 // Pointers might point to unallocated memory at the end but the caller should
 // know not to use them from the return value
 static int	phallocate(t_fork **utensils, t_philosopher **phils,
@@ -130,27 +107,6 @@ t_philosopher	*phinitialize(unsigned int a[])
 		}
 	}
 	return (ps);
-}
-
-pthread_t	*phacilitate(t_philosopher *phils, int philc)
-{
-	pthread_t		*threads;
-	int				i;
-
-	threads = malloc(sizeof(pthread_t) * philc);
-	if (threads == NULL)
-		return (NULL);
-	i = -1;
-	while (++i < philc)
-	{
-		if (pthread_create(&threads[i], NULL, (void * (*)(void *))philosophize,
-			(void *)&phils[i]))
-		{
-			free(threads);
-			return (NULL);
-		}
-	}
-	return (threads);
 }
 
 int	main(int argc, char *argv[])

@@ -11,54 +11,9 @@
 /* ************************************************************************** */
 
 #include <unistd.h>
-#include <stdio.h>
 #include <sys/time.h>
 #include <pthread.h>
-#include <stdlib.h>
 #include "philo.h"
-
-void	phrint(int print_case, t_philosopher *phil)
-{
-	long int	time;
-
-	pthread_mutex_lock(&phil->mutexes[PRINT_MUTEX_I]);
-	time = get_time_in_ms() - phil->inception;
-	if (print_case == EAT)
-		printf("%ld %d is eating\n", time, phil->id);
-	else if (print_case == SLEEP)
-		printf("%ld %d is sleeping\n", time, phil->id);
-	else if (print_case == FORK_TAKE)
-		printf("%ld %d has taken a fork\n", time, phil->id);
-	else if (print_case == DIE)
-	{
-		printf("%ld %d died\n", time, phil->id);
-		printf("%d Distance from death %ld\n", phil->id, get_time_in_us() - phil->prev_meal - phil->ttd);
-	}
-	else if (print_case == THINK)
-		printf("%ld %d is thinking\n", time, phil->id);
-	pthread_mutex_unlock(&phil->mutexes[PRINT_MUTEX_I]);
-}
-
-int	should_die(t_philosopher *phil)
-{
-	pthread_mutex_lock(&phil->mutexes[DEATH_MUTEX_I]);
-	if (*phil->death)
-	{
-		pthread_mutex_unlock(&phil->mutexes[DEATH_MUTEX_I]);
-		phil->dead = 1;
-		return (-1);
-	}
-	if (get_time_in_us() - (phil->prev_meal + phil->ttd) > 0)
-	{
-		*phil->death = 1;
-		pthread_mutex_unlock(&phil->mutexes[DEATH_MUTEX_I]);
-		phil->dead = 1;
-		phrint(DIE, phil);
-		return (1);
-	}
-	pthread_mutex_unlock(&phil->mutexes[DEATH_MUTEX_I]);
-	return (0);
-}
 
 // ie. sleep
 void	deep_think(t_philosopher *phil)
@@ -88,7 +43,7 @@ void	eat(t_philosopher *phil)
 	if (!(phil->id % 2) && take_fork(phil, phil->l_utensil))
 		if (! take_fork(phil, phil->r_utensil))
 			drop_fork(phil->l_utensil);
-	if(! phil->dead)
+	if (!phil->dead)
 	{
 		if (! should_die(phil))
 		{
@@ -105,7 +60,7 @@ void	eat(t_philosopher *phil)
 
 int	take_fork(t_philosopher *phil, t_fork *f)
 {
-	while (! phil->dead)
+	while (! should_die(phil))
 	{
 		pthread_mutex_lock(&(f->grab_mutex));
 		if (should_die(phil))

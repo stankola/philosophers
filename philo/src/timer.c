@@ -14,7 +14,7 @@
 #include <sys/time.h>
 #include "philo.h"
 
-long int	get_time_in_us()
+long int	get_time_in_us(void)
 {
 	struct timeval	now;
 
@@ -22,7 +22,7 @@ long int	get_time_in_us()
 	return (now.tv_sec * 1000000 + now.tv_usec);
 }
 
-long int	get_time_in_ms()
+long int	get_time_in_ms(void)
 {
 	struct timeval	now;
 
