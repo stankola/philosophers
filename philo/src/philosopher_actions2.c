@@ -14,21 +14,29 @@
 #include <stdio.h>
 #include "philo.h"
 
+#include <time.h>
 static t_philosopher	*philosophize(t_philosopher *phil)
 {
 	void				(*actions[3])(t_philosopher *);
 	int					i;
 	static volatile int	death = 0;
 
+//	long int start, end;
+
 	actions[0] = &deep_think;
 	actions[1] = &think;
 	actions[2] = &eat;
 	phil->death = &death;
-	i = phil->id % 2;
+//	i = phil->id % 2;
+	i = 0;
 	phil->prev_meal = get_time_in_us();
 	while (! phil->dead)
 	{
+//		start = get_time_in_us();
 		(*actions[i])(phil);
+//		end = get_time_in_us() - start;
+//		double time_taken = ((double)end)/CLOCKS_PER_SEC; // in seconds
+//		printf("%d fun %d took %ld microseconds to execute \n", phil->id, i, end);
 		if ((i + 1) % 3 == 0 && ! phil->dead && phil->mm != 0 && ! --phil->mm)
 			return (phil);
 		i = (i + 1) % 3;
@@ -62,7 +70,7 @@ void	phrint(int print_case, t_philosopher *phil)
 {
 	long int	time;
 
-	time = get_time_in_ms() - phil->inception;
+	time = (get_time_in_ms() - phil->inception);
 	pthread_mutex_lock(&phil->mutexes[PRINT_MUTEX_I]);
 	if (print_case == DIE)
 		printf("%ld %d died\n", time, phil->id);
@@ -71,7 +79,7 @@ void	phrint(int print_case, t_philosopher *phil)
 		pthread_mutex_lock(&phil->mutexes[DEATH_MUTEX_I]);
 		if (*phil->death)
 			;
-		else if (print_case == EAT)
+		if (print_case == EAT)
 			printf("%ld %d is eating\n", time, phil->id);
 		else if (print_case == SLEEP)
 			printf("%ld %d is sleeping\n", time, phil->id);

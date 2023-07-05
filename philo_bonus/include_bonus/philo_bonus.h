@@ -21,20 +21,12 @@
 # define PRINT_SEMAPHORE_NAME "Phrinty"
 # define SLEEP_CYCLE 250
 
-/* Arguments:
-number_of_philosophers
-time_to_die
-time_to_eat
-time_to_sleep
-[number_of_times_each_philosopher_must_eat]
-Let valid values belong to the range [0,UINT_MAX]
-*/
 enum e_args
 {
 	no_of_phils = 0,
-	time_to_die = 1,
-	time_to_eat = 2,
-	time_to_sleep = 3,
+	ttd = 1,
+	tte = 2,
+	tts = 3,
 	max_meals = 4
 };
 

@@ -13,7 +13,8 @@
 #ifndef PHILO_H
 # define PHILO_H
 # include <pthread.h>
-# define SLEEP_CYCLE 250	// sleeping period in microseconds
+# define SLEEP_CYCLE 500	// sleeping period in microseconds
+# define FORK_SLEEP_CYCLE 200
 
 enum e_arg_indices
 {

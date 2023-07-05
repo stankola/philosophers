@@ -24,8 +24,8 @@ void	deep_think(t_philosopher *phil)
 	{
 		sleep_start = get_time_in_us();
 		phrint(SLEEP, phil);
-		while ((get_time_in_us() - phil->tts) < sleep_start
-			&& !should_die(phil))
+		while (!should_die(phil)
+			&& (get_time_in_us() - phil->tts) < sleep_start)
 			usleep(SLEEP_CYCLE);
 	}
 }
@@ -33,6 +33,8 @@ void	deep_think(t_philosopher *phil)
 void	think(t_philosopher *phil)
 {
 	phrint(THINK, phil);
+	usleep(SLEEP_CYCLE * (phil->id % 2));
+//	usleep(SLEEP_CYCLE / 2 * (phil->id % 2));
 }
 
 void	eat(t_philosopher *phil)
@@ -77,7 +79,7 @@ int	take_fork(t_philosopher *phil, t_fork *f)
 			return (1);
 		}
 		pthread_mutex_unlock(&(f->grab_mutex));
-		usleep(SLEEP_CYCLE);
+		usleep(FORK_SLEEP_CYCLE);
 	}
 	return (0);
 }

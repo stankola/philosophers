@@ -67,10 +67,10 @@ t_philosopher	*phinitialize(unsigned int a[])
 	i = 0;
 	while (++i < a[no_of_phils])
 	{
-		ps[i] = (t_philosopher){i + 1, a[time_to_die], a[time_to_eat],
-			a[time_to_sleep], a[max_meals], 0, 0, now, NULL};
+		ps[i] = (t_philosopher){i + 1, a[ttd], a[tte],
+			a[tts], a[max_meals], 0, 0, now, NULL};
 	}
-	ps[0] = (t_philosopher){1, a[time_to_die], a[time_to_eat], a[time_to_sleep],
+	ps[0] = (t_philosopher){1, a[ttd], a[tte], a[tts],
 		a[max_meals], 0, 0, now, NULL};
 	sem_open(GRAB_SEMAPHORE_NAME, O_CREAT | O_EXCL, 00660, 1); // O_EXCL shouldn't be strictly required here but I'll do it anyway
 	sem_open(PRINT_SEMAPHORE_NAME, O_CREAT | O_EXCL, 00660, 1);
@@ -118,9 +118,9 @@ int	main(int argc, char *argv[])
 		return (22);
 	if (argc == 5)
 		args[max_meals] = 0;
-	args[time_to_die] *= 1000;
-	args[time_to_eat] *= 1000;
-	args[time_to_sleep] *= 1000;
+	args[ttd] *= 1000;
+	args[tte] *= 1000;
+	args[tts] *= 1000;
 	phils = phinitialize(args);
 	phids = phacilitate(phils, args[no_of_phils]);
 	if (phids != NULL)
