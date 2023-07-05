@@ -33,7 +33,10 @@ void	deep_think(t_philosopher *phil)
 void	think(t_philosopher *phil)
 {
 	phrint(THINK, phil);
-	usleep(SLEEP_CYCLE * (phil->id % 2));
+	if (phil->id == 1)
+		usleep(SLEEP_CYCLE * 2 / 5);
+	else
+		usleep(SLEEP_CYCLE * (phil->id % 2));
 //	usleep(SLEEP_CYCLE / 2 * (phil->id % 2));
 }
 
