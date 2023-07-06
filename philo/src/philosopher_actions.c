@@ -26,24 +26,27 @@ void	deep_think(t_philosopher *phil)
 		phrint(SLEEP, phil);
 		while (!should_die(phil)
 			&& (get_time_in_us() - phil->tts) < sleep_start)
-//			usleep(SLEEP_CYCLE);
-		{
-			if (phil->id == 1)
-				usleep(SLEEP_CYCLE * 2 / 5);
-			else
-				usleep(SLEEP_CYCLE * (phil->id % 2));
-		}
+			usleep(SLEEP_CYCLE);
+//		{
+//			if (phil->id == 1)
+//				usleep(SLEEP_CYCLE * 2 / 5);
+//			else
+//				usleep(SLEEP_CYCLE * (phil->id % 2));
+//		}
 	}
 }
 
+
+#include <stdlib.h>
 void	think(t_philosopher *phil)
 {
 	phrint(THINK, phil);
-	if (phil->id == 1)
-		usleep(SLEEP_CYCLE * 2 / 5);
-	else
-		usleep(SLEEP_CYCLE * (phil->id % 2));
-//	usleep(SLEEP_CYCLE / 2 * (phil->id % 2));
+//	usleep(random() % 1000);
+//	if (phil->id == 1)
+//		usleep(SLEEP_CYCLE * 2 / 5);
+//	else
+//		usleep(SLEEP_CYCLE * (phil->id % 2));
+	usleep(SLEEP_CYCLE / 2 * (phil->id % 2));
 }
 
 void	eat(t_philosopher *phil)
@@ -62,13 +65,13 @@ void	eat(t_philosopher *phil)
 			phrint(EAT, phil);
 			while (!should_die(phil)
 				&& (get_time_in_us() - phil->tte) < phil->prev_meal)
-//				usleep(SLEEP_CYCLE);
-			{
-				if (phil->id == 1)
-					usleep(SLEEP_CYCLE * 2 / 5);
-				else
-					usleep(SLEEP_CYCLE * (phil->id % 2));
-			}
+				usleep(SLEEP_CYCLE);
+//			{
+//				if (phil->id == 1)
+//					usleep(SLEEP_CYCLE * 2 / 5);
+//				else
+//					usleep(SLEEP_CYCLE * (phil->id % 2));
+//			}
 		}
 		drop_fork(phil->r_utensil);
 		drop_fork(phil->l_utensil);
@@ -94,11 +97,12 @@ int	take_fork(t_philosopher *phil, t_fork *f)
 			return (1);
 		}
 		pthread_mutex_unlock(&(f->grab_mutex));
-//		usleep(FORK_SLEEP_CYCLE);
-		if (phil->id == 1)
-			usleep(SLEEP_CYCLE * 2 / 5);
-		else
-			usleep(SLEEP_CYCLE * (phil->id % 2));	}
+		usleep(FORK_SLEEP_CYCLE);
+//		if (phil->id == 1)
+//			usleep(SLEEP_CYCLE * 2 / 5);
+//		else
+//			usleep(SLEEP_CYCLE * (phil->id % 2));	
+	}
 	return (0);
 }
 

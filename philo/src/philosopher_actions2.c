@@ -27,7 +27,7 @@ static t_philosopher	*philosophize(t_philosopher *phil)
 	actions[1] = &think;
 	actions[2] = &eat;
 	phil->death = &death;
-//	i = phil->id % 2;
+	i = phil->id % 2;
 	i = 0;
 	phil->prev_meal = get_time_in_us();
 	while (! phil->dead)
@@ -80,7 +80,7 @@ void	phrint(int print_case, t_philosopher *phil)
 	{
 		pthread_mutex_lock(&phil->mutexes[DEATH_MUTEX_I]);
 		if (*phil->death)
-			;
+		{;}
 		if (print_case == EAT)
 			printf("%ld %d is eating\n", time, phil->id);
 		else if (print_case == SLEEP)

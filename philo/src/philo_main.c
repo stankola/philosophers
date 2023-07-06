@@ -64,8 +64,8 @@ static void	phree(t_philosopher **phils, int philc)
 	}
 	pthread_mutex_destroy(&(*phils)->mutexes[DEATH_MUTEX_I]);
 	pthread_mutex_destroy(&(*phils)->mutexes[PRINT_MUTEX_I]);
-	if ((*phils)->r_utensil != NULL)
-		free((*phils)->r_utensil);
+	if ((*phils)->l_utensil != NULL)
+		free((*phils)->l_utensil);
 	free((*phils)->mutexes);
 	free((*phils));
 	*phils = NULL;
@@ -92,15 +92,11 @@ t_philosopher	*phinitialize(unsigned int a[])
 		return (NULL);
 	now = get_time_in_ms();
 	i = 0;
-	while (++i < a[no_of_phils])
-		ps[i] = (t_philosopher){i + 1, a[ttd], a[tte], a[tts], a[max_meals],
-			0, 0, 0, now, &fs[i], &fs[i - 1], NULL, mutexes};
-	ps[0] = (t_philosopher){1, a[ttd], a[tte], a[tts], a[max_meals],
-		0, 0, 0, now, &fs[0], &fs[a[no_of_phils] - 1], NULL, mutexes};
-	i = 0;
-	while (i < a[no_of_phils])
+	while (++i <= a[no_of_phils])
 	{
-		if (finitialize(&fs[i++]))
+		ps[i - 1] = (t_philosopher){i, a[ttd], a[tte], a[tts], a[max_meals],
+			0, 0, 0, now, &fs[i % a[no_of_phils]], &fs[i - 1], NULL, mutexes};
+		if (finitialize(&fs[i - 1]))
 		{
 			phree(&ps, a[no_of_phils]);
 			return (NULL);
