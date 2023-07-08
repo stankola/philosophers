@@ -36,17 +36,29 @@ void	deep_think(t_philosopher *phil)
 	}
 }
 
-
-#include <stdlib.h>
+#include <stdio.h>
 void	think(t_philosopher *phil)
 {
+	int	sync_time;
+
 	phrint(THINK, phil);
 //	usleep(random() % 1000);
 //	if (phil->id == 1)
 //		usleep(SLEEP_CYCLE * 2 / 5);
 //	else
 //		usleep(SLEEP_CYCLE * (phil->id % 2));
-	usleep(SLEEP_CYCLE / 2 * (phil->id % 2));
+	sync_time = phil->inception * 1000 + phil->tts + phil->eat_count * (1000 + (phil->no_of_phils * 200) + phil->tts + phil->tte + (phil->tte * (phil->no_of_phils % 2)));
+	if (phil->no_of_phils % 2 && phil->id == phil->no_of_phils)
+		sync_time += (phil->tte) * 2;
+	else
+		sync_time += (phil->tte) * (phil->id % 2);
+	sync_time = sync_time - get_time_in_us();
+//	if (phil->prev_meal - phil->inception * 1000 < 60000)
+//		sync_time -= 200000;
+	printf("%d sync_time %d\n", phil->id, sync_time);
+	if (sync_time < 0)
+		return ;
+	usleep(sync_time); // TODO death watch sleeping
 }
 
 void	eat(t_philosopher *phil)
@@ -75,6 +87,7 @@ void	eat(t_philosopher *phil)
 		}
 		drop_fork(phil->r_utensil);
 		drop_fork(phil->l_utensil);
+		phil->eat_count++;
 	}
 }
 

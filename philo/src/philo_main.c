@@ -95,7 +95,7 @@ t_philosopher	*phinitialize(unsigned int a[])
 	while (++i <= a[no_of_phils])
 	{
 		ps[i - 1] = (t_philosopher){i, a[ttd], a[tte], a[tts], a[max_meals],
-			0, 0, 0, now, &fs[i % a[no_of_phils]], &fs[i - 1], NULL, mutexes};
+			0, 0, 0, a[no_of_phils], now, &fs[i % a[no_of_phils]], &fs[i - 1], NULL, mutexes};
 		if (finitialize(&fs[i - 1]))
 		{
 			phree(&ps, a[no_of_phils]);
