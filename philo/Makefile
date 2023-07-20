@@ -16,7 +16,7 @@ NAME_BONUS = philo_bonus
 
 CC = cc
 
-CFLAGS = -Wall -Wextra -Werror
+CFLAGS = -Wall -Wextra -Werror -Ofast
 
 SFLAGS = -fsanitize=address -g3
 
