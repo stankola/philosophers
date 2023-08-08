@@ -38,7 +38,7 @@ void	deep_think(t_philosopher *phil)
 
 #include <stdio.h>
 void	think(t_philosopher *phil)
-{
+{	// This seems to work fairly well with odd number of phils. On even number it starts to desync off the bat
 	int	sync_time;
 
 	phrint(THINK, phil);
@@ -47,7 +47,9 @@ void	think(t_philosopher *phil)
 //		usleep(SLEEP_CYCLE * 2 / 5);
 //	else
 //		usleep(SLEEP_CYCLE * (phil->id % 2));
-	sync_time = phil->inception * 1000 + phil->tts + phil->eat_count * (phil->tts + phil->tte + (phil->tte * (phil->no_of_phils % 2))) ;//+ phil->no_of_phils * 50 * (phil->eat_count + 1);
+	sync_time = phil->inception * 1000 + phil->tts +
+		phil->eat_count * (phil->tts + phil->tte + phil->tte);
+			//(phil->tte * (phil->no_of_phils % 2))) ;//+ phil->no_of_phils * 50 * (phil->eat_count + 1);
 	if (phil->no_of_phils % 2 && phil->id == phil->no_of_phils)
 		sync_time += (phil->tte) * 2;
 	else
