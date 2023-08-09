@@ -50,50 +50,32 @@ void	think(t_philosopher *phil)
 
 	// TODO while loop here in case we oversleep.
 	if (phil->no_of_phils % 2)
-	{
 		sync_time = (get_time_in_us() - (phil->inception * 1000)) % (3 * phil->tte);
-		fprintf(stderr, "%d sync_time %d\n", phil->id, sync_time);
-		if (phil->id == 1)		// 3. slot
-		{
-			if (sync_time > (2 * phil->tte))
-				return ;
-			else
-				usleep (2 * phil->tte - sync_time);
-		}
-		else if (phil->id % 2)	// 1. slot
-		{
-			if (sync_time <= (phil->tte))
-				return ;
-			else
-				usleep(3 * phil->tte - sync_time);
-		}
-		else					// 2. slot
-		{
-			if (sync_time > (phil->tte) && sync_time <= 2 * phil->tte)
-				return ;
-			else
-				usleep(3 * phil->tte - sync_time + phil->tte);
-		}
-	}
 	else
-	{
 		sync_time = (get_time_in_us() - (phil->inception * 1000)) % (2 * phil->tte);
-		fprintf(stderr, "%d sync_time %d\n", phil->id, sync_time);
-		if (phil->id % 2)
-		{
-			if (sync_time <= (phil->tte))
-				return ;
-			else
-				usleep(2 * phil->tte - sync_time);
-		}
-		else
-		{
-			if (sync_time <= (phil->tte))
-				usleep(phil->tte - sync_time);
-			else
-				return ;
-		}
+	int	current_meal_time_slot = sync_time / phil->tte;
+	int time_to_meal;
+	fprintf(stderr, "%ld %d sync_time %d\n", get_time_in_ms() - phil->inception, phil->id, sync_time);
+	if (phil->no_of_phils % 2 && phil->id == 1)		// 3. slot, 1 phil when odd phils
+	{
+		if (current_meal_time_slot == 2)
+			return ;
+		time_to_meal = 2 * phil->tte - sync_time;
 	}
+	else if (phil->id % 2)	// 1. slot, odd phil
+	{
+		if (current_meal_time_slot == 0)
+			return ;
+		time_to_meal = (2 + (phil->no_of_phils % 2)) * phil->tte - sync_time;
+	}
+	else					// 2. slot, even phil
+	{
+		if (current_meal_time_slot == 1)
+			return ;
+		time_to_meal = (sync_time < phil->tte) * (phil->tte - sync_time) + (sync_time >= 2 * phil->tte) * (phil->tte + 3 * phil->tte - sync_time);
+	}
+	fprintf(stderr, "%ld %d time to meal %d\n", get_time_in_ms() - phil->inception, phil->id, time_to_meal);
+	usleep(time_to_meal);
 
 
 /*		
