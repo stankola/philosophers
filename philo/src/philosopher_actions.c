@@ -50,9 +50,11 @@ void	think(t_philosopher *phil)
 
 	// TODO while loop here in case we oversleep.
 	if (phil->no_of_phils % 2)
-		sync_time = (get_time_in_us() - (phil->inception * 1000)) % (3 * phil->tte);
+//		sync_time = (get_time_in_us() - (phil->inception * 1000) + ((phil->ttd - phil->tte - phil->tts) / 10000 * phil->eat_count)) % (3 * phil->tte);
+		sync_time = (get_time_in_us() - (phil->inception * 1000) - 800 * phil->eat_count) % (3 * phil->tte);
 	else
-		sync_time = (get_time_in_us() - (phil->inception * 1000)) % (2 * phil->tte);
+//		sync_time = (get_time_in_us() - (phil->inception * 1000) + ((phil->ttd - phil->tte - phil->tts) / 10000 * phil->eat_count)) % (2 * phil->tte);
+		sync_time = (get_time_in_us() - (phil->inception * 1000) - 800 * phil->eat_count) % (2 * phil->tte);
 	int	current_meal_time_slot = sync_time / phil->tte;
 	int time_to_meal;
 	fprintf(stderr, "%ld %d sync_time %d\n", get_time_in_ms() - phil->inception, phil->id, sync_time);
