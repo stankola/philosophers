@@ -80,8 +80,8 @@ void	phrint(int print_case, t_philosopher *phil)
 	{
 		pthread_mutex_lock(&phil->mutexes[DEATH_MUTEX_I]);
 		if (*phil->death)
-		{;}
-		if (print_case == EAT)
+			;
+		else if (print_case == EAT)
 			printf("%ld %d is eating\n", time, phil->id);
 		else if (print_case == SLEEP)
 			printf("%ld %d is sleeping\n", time, phil->id);

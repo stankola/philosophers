@@ -51,13 +51,13 @@ void	think(t_philosopher *phil)
 	// TODO while loop here in case we oversleep.
 	if (phil->no_of_phils % 2)
 //		sync_time = (get_time_in_us() - (phil->inception * 1000) + ((phil->ttd - phil->tte - phil->tts) / 10000 * phil->eat_count)) % (3 * phil->tte);
-		sync_time = (get_time_in_us() - (phil->inception * 1000) - 800 * phil->eat_count) % (3 * phil->tte);
+		sync_time = (get_time_in_us() - (phil->inception * 1000) - phil->no_of_phils * phil->eat_count * 100) % (3 * phil->tte);
 	else
 //		sync_time = (get_time_in_us() - (phil->inception * 1000) + ((phil->ttd - phil->tte - phil->tts) / 10000 * phil->eat_count)) % (2 * phil->tte);
-		sync_time = (get_time_in_us() - (phil->inception * 1000) - 800 * phil->eat_count) % (2 * phil->tte);
+		sync_time = (get_time_in_us() - (phil->inception * 1000) - phil->no_of_phils * phil->eat_count * 100) % (2 * phil->tte);
 	int	current_meal_time_slot = sync_time / phil->tte;
 	int time_to_meal;
-	fprintf(stderr, "%ld %d sync_time %d\n", get_time_in_ms() - phil->inception, phil->id, sync_time);
+	fprintf(stderr, "%ld %d sync_time %d time to live %ld\n", get_time_in_ms() - phil->inception, phil->id, sync_time, phil->prev_meal + phil->ttd - get_time_in_us());
 	if (phil->no_of_phils % 2 && phil->id == 1)		// 3. slot, 1 phil when odd phils
 	{
 		if (current_meal_time_slot == 2)
