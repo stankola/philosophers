@@ -39,7 +39,7 @@ void	deep_think(t_philosopher *phil)
 #include <stdio.h>
 void	think(t_philosopher *phil)
 {	// This seems to work fairly well with odd number of phils. On even number it starts to desync off the bat
-	int	sync_time;
+//	int	sync_time;
 
 	phrint(THINK, phil);
 //	usleep(random() % 1000);
@@ -48,6 +48,33 @@ void	think(t_philosopher *phil)
 //	else
 //		usleep(SLEEP_CYCLE * (phil->id % 2));
 
+	int simulation_time = get_time_in_us() - (phil->inception * 1000);
+	int meal_duration = phil->tte + (phil->ttd - phil->tte - phil->tts) / 4;
+	int	meal_cycle_time = simulation_time % ((2 + (phil->no_of_phils % 2)) * meal_duration);
+	int current_meal_time_slot = meal_cycle_time / meal_duration;	//  tai 2 * meal_duration
+	int time_to_meal;
+	fprintf(stderr, "%ld %d meal_duration %d meal_cycle_time %d current_meal_time_slot %d time to live %ld\n", get_time_in_ms() - phil->inception, phil->id, meal_duration, meal_cycle_time, current_meal_time_slot, phil->prev_meal + phil->ttd - get_time_in_us());
+	if (phil->no_of_phils % 2 && phil->id == 1)		// 3. slot, 1 phil when odd phils
+	{
+		if (current_meal_time_slot == 2)
+			return ;
+		time_to_meal = 2 * meal_duration - meal_cycle_time;
+	}
+	else if (phil->id % 2)	// 1. slot, odd phil
+	{
+		if (current_meal_time_slot == 0)
+			return ;
+		time_to_meal = (2 + (phil->no_of_phils % 2)) * meal_duration - meal_cycle_time;
+	}
+	else					// 2. slot, even phil
+	{
+		if (current_meal_time_slot == 1)
+			return ;
+		time_to_meal = (meal_cycle_time < meal_duration) * (meal_duration - meal_cycle_time) + (meal_cycle_time >= 2 * meal_duration) * (meal_duration + 3 * meal_duration - meal_cycle_time);
+	}
+	fprintf(stderr, "%ld %d time to meal %d\n", get_time_in_ms() - phil->inception, phil->id, time_to_meal);
+	usleep(time_to_meal);
+/*
 	// TODO while loop here in case we oversleep.
 	if (phil->no_of_phils % 2)
 //		sync_time = (get_time_in_us() - (phil->inception * 1000) + ((phil->ttd - phil->tte - phil->tts) / 10000 * phil->eat_count)) % (3 * phil->tte);
@@ -78,7 +105,7 @@ void	think(t_philosopher *phil)
 	}
 	fprintf(stderr, "%ld %d time to meal %d\n", get_time_in_ms() - phil->inception, phil->id, time_to_meal);
 	usleep(time_to_meal);
-
+*/
 
 /*		
 	sync_time = phil->inception * 1000 + phil->tts +
