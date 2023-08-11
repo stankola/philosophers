@@ -22,8 +22,6 @@ static t_philosopher	*philosophize(t_philosopher *phil)
 	int					i;
 	static volatile int	death = 0;
 
-//	long int start, end;
-
 	actions[0] = &deep_think;
 	actions[1] = &think;
 	actions[2] = &eat;
@@ -32,11 +30,7 @@ static t_philosopher	*philosophize(t_philosopher *phil)
 	phil->prev_meal = get_time_in_us();
 	while (! phil->dead)
 	{
-//		start = get_time_in_us();
 		(*actions[i])(phil);
-//		end = get_time_in_us() - start;
-//		double time_taken = ((double)end)/CLOCKS_PER_SEC; // in seconds
-//		printf("%d fun %d took %ld microseconds to execute \n", phil->id, i, end);
 		if ((i + 1) % 3 == 0 && ! phil->dead && phil->mm != 0 && ! --phil->mm)
 			return (phil);
 		i = (i + 1) % 3;
@@ -46,14 +40,18 @@ static t_philosopher	*philosophize(t_philosopher *phil)
 }
 
 // phleep as in philo sleep
-int	phleep(t_philosopher *phil, suseconds_t duration, suseconds_t sleep_cycle)
+int	phleep(t_philosopher *phil, suseconds_t duration)
 {
 	long int	wake_up;
+	suseconds_t	*interval;
 
+	interval = (suseconds_t []){LONG_SLEEP_INTERVAL, MEDIUM_SLEEP_INTERVAL, SHORT_SLEEP_INTERVAL};
 	wake_up = get_time_in_us() + duration;
-	while(get_time_in_us() < wake_up)
+	while (get_time_in_us() < wake_up)
 	{
-		usleep(sleep_cycle);
+		while (*interval != SHORT_SLEEP_INTERVAL && (wake_up - get_time_in_us() < *interval))
+			interval++;
+		usleep(*interval);
 		if (should_die(phil))
 			return (1);
 	}

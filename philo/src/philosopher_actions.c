@@ -21,7 +21,7 @@ void	deep_think(t_philosopher *phil)
 //	if (! should_die(phil))
 //	{
 		phrint(SLEEP, phil);
-		phleep(phil, phil->tts, LOW_ALERT_SLEEP_CYCLE);
+		phleep(phil, phil->tts);
 //		while (!should_die(phil)
 //			&& (get_time_in_us() - phil->tts) < sleep_start)
 //			usleep(SLEEP_CYCLE);
@@ -65,7 +65,7 @@ void	think(t_philosopher *phil)
 		time_to_meal = (meal_cycle_time < meal_duration) * (meal_duration - meal_cycle_time) + (meal_cycle_time >= 2 * meal_duration) * (meal_duration + 3 * meal_duration - meal_cycle_time);
 	}
 	fprintf(stderr, "%ld %d time to meal %d\n", get_time_in_ms() - phil->inception, phil->id, time_to_meal);
-	phleep(phil, time_to_meal, LOW_ALERT_SLEEP_CYCLE);
+	phleep(phil, time_to_meal);
 }
 
 void	eat(t_philosopher *phil){
@@ -93,7 +93,7 @@ void	eat(t_philosopher *phil){
 		{
 			phil->prev_meal = get_time_in_us();
 			phrint(EAT, phil);
-			phleep(phil, phil->tte, LOW_ALERT_SLEEP_CYCLE);
+			phleep(phil, phil->tte);
 //			while (!should_die(phil)
 //				&& (get_time_in_us() - phil->tte) < phil->prev_meal)
 //				usleep(SLEEP_CYCLE);
