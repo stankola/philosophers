@@ -10,11 +10,12 @@
 /*                                                                            */
 /* ************************************************************************** */
 
+#include "philo.h"
 #include <stdlib.h>
 #include <stdio.h>
-#include "philo.h"
+#include <sys/time.h>
+#include <unistd.h>
 
-#include <time.h>
 static t_philosopher	*philosophize(t_philosopher *phil)
 {
 	void				(*actions[3])(t_philosopher *);
@@ -27,8 +28,7 @@ static t_philosopher	*philosophize(t_philosopher *phil)
 	actions[1] = &think;
 	actions[2] = &eat;
 	phil->death = &death;
-	i = phil->id % 2;
-	i = 0;
+	i = 1;
 	phil->prev_meal = get_time_in_us();
 	while (! phil->dead)
 	{
@@ -43,6 +43,21 @@ static t_philosopher	*philosophize(t_philosopher *phil)
 	}
 	phil->death = NULL;
 	return (phil);
+}
+
+// phleep as in philo sleep
+int	phleep(t_philosopher *phil, suseconds_t duration, suseconds_t sleep_cycle)
+{
+	long int	wake_up;
+
+	wake_up = get_time_in_us() + duration;
+	while(get_time_in_us() < wake_up)
+	{
+		usleep(sleep_cycle);
+		if (should_die(phil))
+			return (1);
+	}
+	return (0);
 }
 
 pthread_t	*phacilitate(t_philosopher *phils, int philc)

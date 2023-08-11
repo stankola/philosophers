@@ -13,8 +13,11 @@
 #ifndef PHILO_H
 # define PHILO_H
 # include <pthread.h>
-# define SLEEP_CYCLE 250	// sleeping period in microseconds
-# define FORK_SLEEP_CYCLE 200
+# include <sys/types.h>
+//# define SLEEP_CYCLE 250	// sleeping period in microseconds
+//# define FORK_SLEEP_CYCLE 200
+# define LOW_ALERT_SLEEP_CYCLE 1000
+# define HIGH_ALERT_SLEEP_CYCLE 500
 # define BUFFER_ENTRIES_PER_PHILOSOPHER 5
 
 enum e_arg_indices
@@ -89,6 +92,8 @@ void		deep_think(t_philosopher *phil);
 int			take_fork(t_philosopher *phil, t_fork *f);
 
 void		drop_fork(t_fork *f);
+
+int		phleep(t_philosopher *phil, suseconds_t duration, suseconds_t sleep_cycle);
 
 pthread_t	*phacilitate(t_philosopher *phils, int philc);
 
