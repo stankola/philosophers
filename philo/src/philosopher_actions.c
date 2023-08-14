@@ -18,20 +18,8 @@
 // ie. sleep
 void	deep_think(t_philosopher *phil)
 {
-//	if (! should_die(phil))
-//	{
-		phrint(SLEEP, phil);
-		phleep(phil, phil->tts);
-//		while (!should_die(phil)
-//			&& (get_time_in_us() - phil->tts) < sleep_start)
-//			usleep(SLEEP_CYCLE);
-//		{
-//			if (phil->id == 1)
-//				usleep(SLEEP_CYCLE * 2 / 5);
-//			else
-//				usleep(SLEEP_CYCLE * (phil->id % 2));
-//		}
-//	}
+	phrint(SLEEP, phil);
+	phleep(phil, phil->tts);
 }
 
 #include <stdio.h>
@@ -69,55 +57,30 @@ void	think(t_philosopher *phil)
 }
 
 void	eat(t_philosopher *phil){
-	/*
 	if ((phil->id % 2) && take_fork(phil, phil->r_utensil))
 		if (! take_fork(phil, phil->l_utensil))
 			drop_fork(phil->r_utensil);
 	if (!(phil->id % 2) && take_fork(phil, phil->l_utensil))
 		if (! take_fork(phil, phil->r_utensil))
 			drop_fork(phil->l_utensil);
-*/
-//	if (!phil->dead)
-//	{
-		if (phil->id % 2) // TODO death check between fork grabbing? Shouldn't be an issue, but techincally required
-		{
-			take_fork(phil, phil->l_utensil);
-			take_fork(phil, phil->r_utensil);
-		}
-		else
-		{
-			take_fork(phil, phil->r_utensil);
-			take_fork(phil, phil->l_utensil);
-		}
+	if (!phil->dead)
+	{
 		if (! should_die(phil))
 		{
 			phil->prev_meal = get_time_in_us();
 			phrint(EAT, phil);
 			phleep(phil, phil->tte);
-//			while (!should_die(phil)
-//				&& (get_time_in_us() - phil->tte) < phil->prev_meal)
-//				usleep(SLEEP_CYCLE);
-//			{
-//				if (phil->id == 1)
-//					usleep(SLEEP_CYCLE * 2 / 5);
-//				else
-//					usleep(SLEEP_CYCLE * (phil->id % 2));
-//			}
 		}
 		drop_fork(phil->r_utensil);
 		drop_fork(phil->l_utensil);
 		phil->eat_count++;
-//	}
+	}
 }
 
 int	take_fork(t_philosopher *phil, t_fork *f)
 {
-	//TODO: Consider the need for grab mutex. It's main usage is to check if the phil dies while grabbing
-	pthread_mutex_lock(&(f->fork_mutex));
 	phrint(FORK_TAKE, phil);
-	return (1);
-	/*
-	while (! should_die(phil))
+	while (1)
 	{
 		pthread_mutex_lock(&(f->grab_mutex));
 		if (should_die(phil))
@@ -134,19 +97,15 @@ int	take_fork(t_philosopher *phil, t_fork *f)
 			return (1);
 		}
 		pthread_mutex_unlock(&(f->grab_mutex));
-		usleep(FORK_SLEEP_CYCLE);
-//		if (phil->id == 1)
-//			usleep(SLEEP_CYCLE * 2 / 5);
-//		else
-//			usleep(SLEEP_CYCLE * (phil->id % 2));	
-	}*/
+		usleep(MEDIUM_SLEEP_INTERVAL);		// TODO Meal slot check here?
+	}
 	return (0);
 }
 
 inline void	drop_fork(t_fork *f)
 {
 	pthread_mutex_unlock(&f->fork_mutex);
-//	pthread_mutex_lock(&(f->grab_mutex));
-//	f->taken = 0;
-//	pthread_mutex_unlock(&(f->grab_mutex));
+	pthread_mutex_lock(&(f->grab_mutex));
+	f->taken = 0;
+	pthread_mutex_unlock(&(f->grab_mutex));
 }

@@ -16,10 +16,12 @@
 # include <sys/types.h>
 //# define SLEEP_CYCLE 250	// sleeping period in microseconds
 //# define FORK_SLEEP_CYCLE 200
-# define LONG_SLEEP_INTERVAL 5000
-# define MEDIUM_SLEEP_INTERVAL 1000
+# define LONG_SLEEP_INTERVAL 10000
+# define MEDIUM_SLEEP_INTERVAL 2500
 # define SHORT_SLEEP_INTERVAL 500
-# define BUFFER_ENTRIES_PER_PHILOSOPHER 5
+# define PRINT_INTERVAL 1000
+# define BUFFER_ENTRY_LENGTH 128
+# define BUFFER_ENTRIES_PER_PHILOSOPHER 8
 
 enum e_arg_indices
 {
@@ -52,6 +54,21 @@ typedef struct s_fork
 	pthread_mutex_t	fork_mutex;
 }	t_fork;
 
+typedef struct s_philo_print_entry
+{
+	long int	time;
+	int		id;
+	int		print_case;
+}	t_philo_print_entry;
+
+typedef struct s_print_buffer
+{
+	volatile t_philo_print_entry	*buffer;
+	volatile int	last;
+	volatile int	length;
+//	pthread_mutex_t	mutex;
+}	t_print_buffer;
+
 typedef struct s_philosopher
 {
 	int				id;
@@ -68,15 +85,16 @@ typedef struct s_philosopher
 	t_fork			*l_utensil;
 	volatile int	*death;
 	pthread_mutex_t	*mutexes;
+	volatile t_print_buffer	**print_buffer;
 }	t_philosopher;
 
-typedef struct s_print_buffer
+typedef struct s_printer_thread
 {
-	volatile int	**buffer;		// long int ?
-	volatile int	buffer_reader;
-	volatile int	buffer_writer;
-	pthread_mutex_t	mutex;
-}	t_print_buffer;
+	volatile t_print_buffer	*buffers[2];
+	volatile t_print_buffer	* volatile current_buffer;
+	pthread_mutex_t	*print_mutex;
+	pthread_mutex_t	*death_mutex;	// TODO Consider deleting this
+}	t_printer_thread;
 
 long int	get_time_in_us(void);
 
@@ -96,10 +114,22 @@ void		drop_fork(t_fork *f);
 
 int		phleep(t_philosopher *phil, suseconds_t duration);//, suseconds_t sleep_cycle);
 
-pthread_t	*phacilitate(t_philosopher *phils, int philc);
+//pthread_t	*phacilitate(t_philosopher *phils, int philc);
+
+pthread_t       *phacilitate(t_philosopher *phils, int philc, t_printer_thread *pr_thread);
 
 int			should_die(t_philosopher *phil);
 
 void		phrint(int print_case, t_philosopher *phil);
+
+int		print_buffer_init(t_print_buffer **print_buffer, int size);
+
+int		print_buffer_write(volatile t_print_buffer *print_buffer, long int time, int id, int print_case);
+
+int		print_buffer_printf(t_print_buffer *print_buffer);
+
+int		*printer_thread(t_printer_thread *pr_thread);
+
+void		printer_thread_init(t_printer_thread **pr_thread, int size, pthread_mutex_t *print_mutex);
 
 #endif

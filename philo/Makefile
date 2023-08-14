@@ -33,7 +33,7 @@ INCDIR = include
 INCDIR_BONUS = include_bonus
 
 _SRC =	philo_main.c parsing.c philosopher_actions.c philosopher_actions2.c \
-		timer.c
+		timer.c printer.c
 SRC = $(patsubst %, $(SRCDIR)/%, $(_SRC))
 
 _OBJ = $(patsubst %.c, %.o, $(_SRC))
