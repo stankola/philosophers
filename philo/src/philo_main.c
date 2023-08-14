@@ -90,7 +90,7 @@ t_philosopher	*phinitialize(unsigned int a[], volatile int **death, t_printer_th
 
 	if (phallocate(&fs, &ps, a, &mutexes))
 		return (NULL);
-	*death = malloc(sizeof(int)); // TODO find a correct place for this
+	*death = malloc(sizeof(int));
 	**death = 0;
 	printer_thread_init(pr_thread, a[no_of_phils], &mutexes[PRINT_MUTEX_I]);
 	now = get_time_in_ms();
@@ -98,7 +98,8 @@ t_philosopher	*phinitialize(unsigned int a[], volatile int **death, t_printer_th
 	while (++i <= a[no_of_phils])
 	{
 		ps[i - 1] = (t_philosopher){i, a[ttd], a[tte], a[tts], a[max_meals],
-			0, 0, 0, a[no_of_phils], now, &fs[i % a[no_of_phils]], &fs[i - 1], *death, mutexes, (volatile t_print_buffer **)&(*pr_thread)->current_buffer};
+			0, 0, 0, a[no_of_phils], now, &fs[i % a[no_of_phils]], &fs[i - 1],
+			*death, mutexes, (volatile t_print_buffer **)&(*pr_thread)->buffer};
 		if (finitialize(&fs[i - 1]))
 		{
 			phree(&ps, a[no_of_phils]);

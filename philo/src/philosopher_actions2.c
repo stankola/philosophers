@@ -53,15 +53,16 @@ int	phleep(t_philosopher *phil, suseconds_t duration)
 	wake_up = time + duration;
 	if (wake_up > phil->prev_meal + phil->ttd)
 		wake_up = phil->prev_meal + phil->ttd;
-	fprintf(stderr, "%ld %d sleeping for %ld\n", get_time_in_ms() - phil->inception, phil->id, (wake_up - get_time_in_us()) / 100 * 90);
+//	fprintf(stderr, "%ld %d sleeping for %ld\n", get_time_in_ms() - phil->inception, phil->id, (wake_up - time) / 100 * 80);
 	if (duration > LONG_SLEEP_INTERVAL)
 		usleep((wake_up - time) / 100 * 80);
-	if (get_time_in_us() > wake_up)
-		fprintf(stderr, "%d overslept by %ld!\n", phil->id, get_time_in_us() - wake_up);
+	time = get_time_in_us();
+//	if (get_time_in_us() > wake_up)
+//		fprintf(stderr, "%d overslept by %ld!\n", phil->id, get_time_in_us() - wake_up);
 	while (time < wake_up)
 	{
-		if (should_die(phil))
-			return (0);
+//		if (should_die(phil))
+//			return (0);
 		while (*interval != SHORT_SLEEP_INTERVAL && (wake_up - time < *interval))
 			interval++;
 		if (wake_up - time < *interval)
@@ -86,9 +87,11 @@ pthread_t	*phacilitate(t_philosopher *phils, int philc, t_printer_thread *pr_thr
 	while (++i < philc + 1)
 	{
 		if (i == 0)
-			err_check = pthread_create(&threads[i], NULL, (void *(*)(void *))printer_thread, (void *)pr_thread);
+			err_check = pthread_create(&threads[i], NULL,
+				(void *(*)(void *))printer_thread, (void *)pr_thread);
 		else
-			err_check = pthread_create(&threads[i], NULL, (void *(*)(void *))philosophize, (void *)&phils[i - 1]);
+			err_check = pthread_create(&threads[i], NULL,
+				(void *(*)(void *))philosophize, (void *)&phils[i - 1]);
 		if (err_check)
 		{
 			free(threads);
@@ -104,26 +107,7 @@ void	phrint(int print_case, t_philosopher *phil)
 
 	time = (get_time_in_ms() - phil->inception);
 	pthread_mutex_lock(&phil->mutexes[PRINT_MUTEX_I]);
-	if (print_case == DIE)
-		print_buffer_write(*phil->print_buffer, time, phil->id, print_case);
-//		printf("%ld %d died\n", time, phil->id);
-	else
-	{
-		pthread_mutex_lock(&phil->mutexes[DEATH_MUTEX_I]);
-		if (*phil->death == 0)
-		{
-			print_buffer_write(*phil->print_buffer, time, phil->id, print_case);
-/*			if (print_case == EAT)
-				printf("%ld %d is eating\n", time, phil->id);
-			else if (print_case == SLEEP)
-				printf("%ld %d is sleeping\n", time, phil->id);
-			else if (print_case == FORK_TAKE)
-				printf("%ld %d has taken a fork\n", time, phil->id);
-			else if (print_case == THINK)
-				printf("%ld %d is thinking\n", time, phil->id);
-*/		}
-		pthread_mutex_unlock(&phil->mutexes[DEATH_MUTEX_I]);
-	}
+	print_buffer_write(*phil->print_buffer, time, phil->id, print_case);
 	pthread_mutex_unlock(&phil->mutexes[PRINT_MUTEX_I]);
 }
 
