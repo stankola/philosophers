@@ -79,7 +79,8 @@ void	eat(t_philosopher *phil){
 
 int	take_fork(t_philosopher *phil, t_fork *f)
 {
-	phrint(FORK_TAKE, phil);
+//	fprintf(stderr, "%d takes a fork in sdterr\n", phil->id);
+//	phrint(FORK_TAKE, phil);
 	while (1)
 	{
 		pthread_mutex_lock(&(f->grab_mutex));

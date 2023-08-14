@@ -45,7 +45,6 @@ int	print_buffer_printf(t_print_buffer *print_buffer)
 	int	i;
 
 	i = -1;
-	fprintf(stderr, "jou\n");
 	while (++i < print_buffer->last)
 	{
 		if (print_buffer->buffer[i].print_case == EAT)
@@ -62,7 +61,6 @@ int	print_buffer_printf(t_print_buffer *print_buffer)
 			return (0);
 		}
 	}
-	fprintf(stderr, "uoj\n");
 	return (1);
 }
 
@@ -74,20 +72,16 @@ int	*printer_thread(t_printer_thread *pr_thread)
 	pr_thread->current_buffer = pr_thread->buffers[current_buffer_i];
 	while (1)
 	{
-		fprintf(stderr, "wau\n");
 		usleep(PRINT_INTERVAL);
 //		usleep(1000000);
-		fprintf(stderr, "mutex\n");
 		pthread_mutex_lock(pr_thread->print_mutex);
-		fprintf(stderr, "xetum\n");
-		fprintf(stderr, "print %p %d\n", pr_thread->buffers[current_buffer_i], current_buffer_i);
+//		fprintf(stderr, "print %p %d\n", pr_thread->buffers[current_buffer_i], current_buffer_i);
 		pr_thread->current_buffer = pr_thread->buffers[!current_buffer_i];
 		pthread_mutex_unlock(pr_thread->print_mutex);
 		if (print_buffer_printf((t_print_buffer *)pr_thread->buffers[current_buffer_i]) == 0)
 			return (NULL);
 		pr_thread->buffers[current_buffer_i]->last = 0;
 		current_buffer_i = !current_buffer_i;
-		fprintf(stderr, "uaw\n");
 	}
 	return (NULL); // TODO return value
 }

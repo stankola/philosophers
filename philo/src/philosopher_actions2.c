@@ -88,7 +88,7 @@ pthread_t	*phacilitate(t_philosopher *phils, int philc, t_printer_thread *pr_thr
 		if (i == 0)
 			err_check = pthread_create(&threads[i], NULL, (void *(*)(void *))printer_thread, (void *)pr_thread);
 		else
-		       	err_check = pthread_create(&threads[i], NULL, (void *(*)(void *))philosophize, (void *)&phils[i]);
+			err_check = pthread_create(&threads[i], NULL, (void *(*)(void *))philosophize, (void *)&phils[i - 1]);
 		if (err_check)
 		{
 			free(threads);
