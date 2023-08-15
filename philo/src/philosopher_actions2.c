@@ -18,9 +18,11 @@
 
 static t_philosopher	*philosophize(t_philosopher *phil)
 {
-	void				(*actions[3])(t_philosopher *);
-	int					i;
+	void	(*actions[3])(t_philosopher *);
+	int		i;
 
+	if (phil == NULL)
+		return (NULL);
 	actions[0] = &deep_think;
 	actions[1] = &think;
 	actions[2] = &eat;
@@ -37,33 +39,25 @@ static t_philosopher	*philosophize(t_philosopher *phil)
 }
 
 // phleep as in philo sleep
-int	phleep(t_philosopher *phil, suseconds_t duration)
+void	phleep(t_philosopher *phil, unsigned int duration)
 {
 	long int	wake_up;
-	suseconds_t	*interval;
 	long int	time;
+	suseconds_t	*interval;	// TODO check if type is ok!
 
-	if (duration <= MEDIUM_SLEEP_INTERVAL)
+	if (duration <= MEDIUM_SLEEP)
 	{
 		usleep(duration);
-		return (1);
+		return ;
 	}
-	interval = (suseconds_t []){LONG_SLEEP_INTERVAL, MEDIUM_SLEEP_INTERVAL, SHORT_SLEEP_INTERVAL};
+	interval = (suseconds_t []){LONG_SLEEP, MEDIUM_SLEEP, SNOOZE};
 	time = get_time_in_us();
-	wake_up = time + duration;
+	wake_up = (time + duration);
 	if (wake_up > phil->prev_meal + phil->ttd)
 		wake_up = phil->prev_meal + phil->ttd;
-//	fprintf(stderr, "%ld %d sleeping for %ld\n", get_time_in_ms() - phil->inception, phil->id, (wake_up - time) / 100 * 80);
-	if (duration > LONG_SLEEP_INTERVAL)
-		usleep((wake_up - time) / 100 * 80);
-	time = get_time_in_us();
-//	if (get_time_in_us() > wake_up)
-//		fprintf(stderr, "%d overslept by %ld!\n", phil->id, get_time_in_us() - wake_up);
-	while (time < wake_up)
+	while (time < wake_up && !should_die(phil))
 	{
-//		if (should_die(phil))
-//			return (0);
-		while (*interval != SHORT_SLEEP_INTERVAL && (wake_up - time < *interval))
+		while (*interval != SNOOZE && (wake_up - time < *interval))
 			interval++;
 		if (wake_up - time < *interval)
 			usleep(wake_up - time);
@@ -71,16 +65,15 @@ int	phleep(t_philosopher *phil, suseconds_t duration)
 			usleep(*interval);
 		time = get_time_in_us();
 	}
-	return (1);
 }
 
-pthread_t	*phacilitate(t_philosopher *phils, int philc, t_printer_thread *pr_thread)
+pthread_t	*phacilitate(t_philosopher *phils, int philc, t_printer_thread *pt)
 {
 	pthread_t	*threads;
 	int			i;
 	int			err_check;
 
-	threads = malloc(sizeof(pthread_t) * philc + 1);
+	threads = malloc(sizeof(pthread_t) * (philc + 1));
 	if (threads == NULL)
 		return (NULL);
 	i = -1;
@@ -88,10 +81,12 @@ pthread_t	*phacilitate(t_philosopher *phils, int philc, t_printer_thread *pr_thr
 	{
 		if (i == 0)
 			err_check = pthread_create(&threads[i], NULL,
-				(void *(*)(void *))printer_thread, (void *)pr_thread);
+				(void *(*)(void *))printer_thread, (void *)pt);
 		else
+		{
 			err_check = pthread_create(&threads[i], NULL,
 				(void *(*)(void *))philosophize, (void *)&phils[i - 1]);
+		}
 		if (err_check)
 		{
 			free(threads);
@@ -111,7 +106,7 @@ void	phrint(int print_case, t_philosopher *phil)
 	pthread_mutex_unlock(&phil->mutexes[PRINT_MUTEX_I]);
 }
 
-inline int	should_die(t_philosopher *phil)
+int	should_die(t_philosopher *phil)
 {
 	if (phil->dead)
 		return (1);

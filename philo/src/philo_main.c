@@ -71,16 +71,7 @@ static void	phree(t_philosopher **phils, int philc)
 	*phils = NULL;
 }
 
-static int	finitialize(t_fork *f)
-{
-	f->taken = 0;
-	if (pthread_mutex_init(&f->fork_mutex, NULL)
-		|| pthread_mutex_init(&f->grab_mutex, NULL))
-		return (-1);
-	return (0);
-}
-
-t_philosopher	*phinitialize(unsigned int a[], volatile int **death, t_printer_thread **pr_thread)
+t_philosopher	*phinitialize(unsigned int a[], volatile int *death, t_printer_thread **pt)
 {
 	t_fork			*fs;
 	t_philosopher	*ps;
@@ -90,17 +81,17 @@ t_philosopher	*phinitialize(unsigned int a[], volatile int **death, t_printer_th
 
 	if (phallocate(&fs, &ps, a, &mutexes))
 		return (NULL);
-	*death = malloc(sizeof(int));
-	**death = 0;
-	printer_thread_init(pr_thread, a[no_of_phils], &mutexes[PRINT_MUTEX_I]);
+	printer_thread_init(pt, a[no_of_phils], &mutexes[PRINT_MUTEX_I]);
 	now = get_time_in_ms();
 	i = 0;
 	while (++i <= a[no_of_phils])
 	{
 		ps[i - 1] = (t_philosopher){i, a[ttd], a[tte], a[tts], a[max_meals],
 			0, 0, 0, a[no_of_phils], now, &fs[i % a[no_of_phils]], &fs[i - 1],
-			*death, mutexes, (volatile t_print_buffer **)&(*pr_thread)->buffer};
-		if (finitialize(&fs[i - 1]))
+			death, mutexes, (volatile t_print_buffer **)&(*pt)->buffer};
+		fs[i - 1].taken = 0;
+		if (pthread_mutex_init(&fs[i - 1].fork_mutex, NULL)
+			|| pthread_mutex_init(&fs[i - 1].grab_mutex, NULL))
 		{
 			phree(&ps, a[no_of_phils]);
 			return (NULL);
@@ -109,35 +100,43 @@ t_philosopher	*phinitialize(unsigned int a[], volatile int **death, t_printer_th
 	return (ps);
 }
 
-#include <stdio.h>
+void	phinish(t_philosopher *phils, pthread_t *threads, unsigned int args[],
+	t_printer_thread *pt)
+{
+	unsigned int	i;
+
+	i = 1;
+	if (threads != NULL)
+	{
+		while (i < args[no_of_phils] + 1)
+			pthread_join(threads[i++], NULL);
+		printer_thread_stop(pt);
+		pthread_join(threads[0], NULL);
+		printer_thread_del(&pt);
+		free(threads);
+	}
+	phree(&phils, args[no_of_phils]);	
+}
+
 int	main(int argc, char *argv[])
 {
-	unsigned int	args[5];
-	t_philosopher	*phils;
-	pthread_t		*threads;
-	unsigned int	i;
-	int volatile	*death;
-	t_printer_thread	*pr_thread;
+	unsigned int		args[5];
+	t_philosopher		*phils;
+	pthread_t			*threads;
+	int volatile		death;
+	t_printer_thread	*pt;
 
 	if (parse_args(argc, argv, args) || args[no_of_phils] == 0
 		|| (argc == 6 && args[max_meals] == 0))
 		return (22);
 	if (argc == 5)
 		args[max_meals] = 0;
-	phils = phinitialize(args, &death, &pr_thread);
+	pt = NULL;
+	death = 0;
+	phils = phinitialize(args, &death, &pt);
 	if (phils == NULL)
 		return (-1);
-	threads = phacilitate(phils, args[no_of_phils], pr_thread);
-	if (threads == NULL)
-	{
-		phree(&phils, args[no_of_phils]);
-		return (-1);
-	}
-	i = 1;
-	while (i < args[no_of_phils] + 1)
-		pthread_join(threads[i++], NULL);
-	free(threads);
-	free((void *)death);
-	phree(&phils, args[no_of_phils]);
+	threads = phacilitate(phils, args[no_of_phils], pt);
+	phinish(phils, threads, args, pt);
 	return (0);
 }

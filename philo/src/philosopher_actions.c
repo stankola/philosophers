@@ -22,38 +22,15 @@ void	deep_think(t_philosopher *phil)
 	phleep(phil, phil->tts);
 }
 
-#include <stdio.h>
 void	think(t_philosopher *phil)
 {
-	int meal_slots = 2 + phil->no_of_phils % 2;
-	int simulation_time = get_time_in_us() - (phil->inception * 1000);
-	int meal_duration = phil->ttd / meal_slots - 25 * ((phil->ttd - meal_slots * phil->tte) / 100);
-	int meal_cycle_time = simulation_time % (meal_slots * meal_duration);
-	int current_meal_time_slot = meal_cycle_time / meal_duration;
-	int time_to_meal;
+	int	time_to_meal;
 
 	phrint(THINK, phil);
-//	fprintf(stderr, "%ld %d meal_duration %d meal_cycle_time %d current_meal_time_slot %d time to live %ld\n", get_time_in_ms() - phil->inception, phil->id, meal_duration, meal_cycle_time, current_meal_time_slot, phil->prev_meal + phil->ttd - get_time_in_us());
-	if (phil->no_of_phils % 2 && phil->id == 1)		// 3. slot, 1 phil when odd phils
-	{
-		if (current_meal_time_slot == 2)
-			return ;
-		time_to_meal = 2 * meal_duration - meal_cycle_time;
-	}
-	else if (phil->id % 2)	// 1. slot, odd phil
-	{
-		if (current_meal_time_slot == 0)
-			return ;
-		time_to_meal = meal_slots * meal_duration - meal_cycle_time;
-	}
-	else					// 2. slot, even phil
-	{
-		if (current_meal_time_slot == 1)
-			return ;
-		time_to_meal = (meal_cycle_time < meal_duration) * (meal_duration - meal_cycle_time) + (meal_cycle_time >= 2 * meal_duration) * (meal_duration + 3 * meal_duration - meal_cycle_time);
-	}
+	time_to_meal = get_time_to_meal(phil);
 //	fprintf(stderr, "%ld %d time to meal %d\n", get_time_in_ms() - phil->inception, phil->id, time_to_meal);
-	phleep(phil, time_to_meal);
+	if (time_to_meal > 0)
+		phleep(phil, time_to_meal);
 }
 
 void	eat(t_philosopher *phil){
@@ -96,7 +73,7 @@ int	take_fork(t_philosopher *phil, t_fork *f)
 			return (1);
 		}
 		pthread_mutex_unlock(&(f->grab_mutex));
-		usleep(SHORT_SLEEP_INTERVAL);		// TODO Meal slot check here?
+		usleep(SNOOZE);
 	}
 	return (0);
 }
