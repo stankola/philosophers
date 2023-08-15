@@ -11,10 +11,11 @@
 /* ************************************************************************** */
 
 #include "philo.h"
+
 #include <stdlib.h>
-#include <stdio.h>
 #include <sys/time.h>
 #include <unistd.h>
+#include <pthread.h>
 
 static t_philosopher	*philosophize(t_philosopher *phil)
 {

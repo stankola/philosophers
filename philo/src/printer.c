@@ -2,7 +2,6 @@
 
 #include <unistd.h>
 #include <stdlib.h>
-	#include <stdio.h>
 
 void	printer_thread_stop(t_printer_thread *pt)
 {
@@ -50,10 +49,10 @@ void	*printer_thread(t_printer_thread *pt)
 		pthread_mutex_lock(&pt->stop_mutex);
 	}
 	pthread_mutex_unlock(&pt->stop_mutex);
-	return (NULL); // TODO return value
+	return (NULL);
 }
 
-int	printer_thread_init(t_printer_thread **pt, int size, pthread_mutex_t *print_mutex)
+int	printer_thread_init(t_printer_thread **pt, int size, pthread_mutex_t *pm)
 {
 	if (pt && *pt == NULL)
 	{
@@ -66,7 +65,7 @@ int	printer_thread_init(t_printer_thread **pt, int size, pthread_mutex_t *print_
 	print_buffer_init((t_print_buffer **)&(*pt)->buffers[0], size);
 	print_buffer_init((t_print_buffer **)&(*pt)->buffers[1], size);
 	(*pt)->buffer = (*pt)->buffers[0];
-	(*pt)->print_mutex = print_mutex;
+	(*pt)->print_mutex = pm;
 	(*pt)->stop = 0;
 	pthread_mutex_init(&(*pt)->stop_mutex, NULL);
 	return (1);

@@ -111,7 +111,7 @@ int			take_fork(t_philosopher *phil, t_fork *f);
 
 void		drop_fork(t_fork *f);
 
-void		phleep(t_philosopher *phil, unsigned int duration);	// TODO confirm if this type is ok
+void		phleep(t_philosopher *phil, unsigned int duration);
 
 pthread_t	*phacilitate(t_philosopher *phils, int philc, t_printer_thread *pt);
 

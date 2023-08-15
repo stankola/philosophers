@@ -40,13 +40,11 @@ int	print_buffer_del(t_print_buffer **pb)
 	return (0);
 }
 
-int	print_buffer_write(t_print_buffer volatile *pb, long int time, int id, int print_case)
+int	print_buffer_write(t_print_buffer volatile *pb, long int time, int id,
+	int print_case)
 {
 	if (pb == NULL || pb->last == pb->length)
-	{
-		fprintf(stderr, "Print buffer full! or Null ptr offered\n"); // TODO Delete this for eval
 		return (0);
-	}
 	pb->buffer[pb->last].time = time;
 	pb->buffer[pb->last].id = id;
 	pb->buffer[pb->last].print_case = print_case;

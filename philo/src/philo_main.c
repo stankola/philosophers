@@ -10,12 +10,12 @@
 /*                                                                            */
 /* ************************************************************************** */
 
+#include "philo.h"
+
 #include <unistd.h>
 #include <stdlib.h>
 #include <pthread.h>
 #include <sys/time.h>
-#include <errno.h>
-#include "philo.h"
 
 // Pointers might point to unallocated memory at the end but the caller should
 // know not to use them from the return value
@@ -71,7 +71,8 @@ static void	phree(t_philosopher **phils, int philc)
 	*phils = NULL;
 }
 
-t_philosopher	*phinitialize(unsigned int a[], volatile int *death, t_printer_thread **pt)
+t_philosopher	*phinitialize(unsigned int a[], int volatile *death,
+	t_printer_thread **pt)
 {
 	t_fork			*fs;
 	t_philosopher	*ps;
