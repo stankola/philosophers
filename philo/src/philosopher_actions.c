@@ -10,10 +10,11 @@
 /*                                                                            */
 /* ************************************************************************** */
 
+#include "philo.h"
+
 #include <unistd.h>
 #include <sys/time.h>
 #include <pthread.h>
-#include "philo.h"
 
 // ie. sleep
 void	deep_think(t_philosopher *phil)
@@ -28,12 +29,12 @@ void	think(t_philosopher *phil)
 
 	phrint(THINK, phil);
 	time_to_meal = get_time_to_meal(phil);
-//	fprintf(stderr, "%ld %d time to meal %d\n", get_time_in_ms() - phil->inception, phil->id, time_to_meal);
 	if (time_to_meal > 0)
 		phleep(phil, time_to_meal);
 }
 
-void	eat(t_philosopher *phil){
+void	eat(t_philosopher *phil)
+{
 	if ((phil->id % 2) && take_fork(phil, phil->r_utensil))
 		if (! take_fork(phil, phil->l_utensil))
 			drop_fork(phil->r_utensil);

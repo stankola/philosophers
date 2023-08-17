@@ -44,7 +44,7 @@ void	phleep(t_philosopher *phil, unsigned int duration)
 {
 	long int	wake_up;
 	long int	time;
-	suseconds_t	*interval;	// TODO check if type is ok!
+	suseconds_t	*interval;
 
 	if (duration <= MEDIUM_SLEEP)
 	{
@@ -82,11 +82,11 @@ pthread_t	*phacilitate(t_philosopher *phils, int philc, t_printer_thread *pt)
 	{
 		if (i == 0)
 			err_check = pthread_create(&threads[i], NULL,
-				(void *(*)(void *))printer_thread, (void *)pt);
+					(void *(*)(void *))printer_thread, (void *)pt);
 		else
 		{
 			err_check = pthread_create(&threads[i], NULL,
-				(void *(*)(void *))philosophize, (void *)&phils[i - 1]);
+					(void *(*)(void *))philosophize, (void *)&phils[i - 1]);
 		}
 		if (err_check)
 		{

@@ -54,15 +54,15 @@ typedef struct s_fork
 typedef struct s_print_entry
 {
 	long int	time;
-	int		id;
-	int		print_case;
+	int			id;
+	int			print_case;
 }	t_print_entry;
 
 typedef struct s_print_buffer
 {
 	volatile t_print_entry	*buffer;
-	volatile int	last;
-	volatile int	length;
+	volatile int			last;
+	volatile int			length;
 }	t_print_buffer;
 
 typedef struct s_philosopher
@@ -87,7 +87,7 @@ typedef struct s_philosopher
 typedef struct s_printer_thread
 {
 	t_print_buffer volatile				*buffers[2];
-	t_print_buffer volatile				* volatile buffer;
+	t_print_buffer volatile				*buffer;
 	pthread_mutex_t						*print_mutex;
 	pthread_mutex_t						stop_mutex;
 	int volatile						stop;
@@ -133,8 +133,8 @@ void		printer_thread_stop(t_printer_thread *pt);
 void		*printer_thread(t_printer_thread *pt);
 
 int			printer_thread_init(t_printer_thread **pt, int size,
-	pthread_mutex_t *print_mutex);
+				pthread_mutex_t *print_mutex);
 
-int		printer_thread_del(t_printer_thread **pt);
+int			printer_thread_del(t_printer_thread **pt);
 
 #endif

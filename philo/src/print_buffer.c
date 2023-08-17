@@ -1,3 +1,15 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   print_buffer.c                                     :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: tsankola <marvin@42.fr>                    +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2023/08/15 10:55:56 by tsankola          #+#    #+#             */
+/*   Updated: 2023/08/15 10:56:00 by tsankola         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "philo.h"
 
 #include <stdlib.h>
@@ -60,16 +72,16 @@ int	print_buffer_printf(t_print_buffer *pb)
 	while (++i < pb->last)
 	{
 		if (pb->buffer[i].print_case == EAT)
-			printf("%ld %d is eating\n", pb->buffer[i].time, pb->buffer[i].id); 
+			printf("%ld %d is eating\n", pb->buffer[i].time, pb->buffer[i].id);
 		else if (pb->buffer[i].print_case == SLEEP)
 			printf("%ld %d is sleeping\n", pb->buffer[i].time,
-				pb->buffer[i].id); 
+				pb->buffer[i].id);
 		else if (pb->buffer[i].print_case == FORK_TAKE)
 			printf("%ld %d has taken a fork\n", pb->buffer[i].time,
-				pb->buffer[i].id); 
+				pb->buffer[i].id);
 		else if (pb->buffer[i].print_case == THINK)
 			printf("%ld %d is thinking\n", pb->buffer[i].time,
-				pb->buffer[i].id); 
+				pb->buffer[i].id);
 		else if (pb->buffer[i].print_case == DIE)
 		{
 			printf("%ld %d died\n", pb->buffer[i].time, pb->buffer[i].id);

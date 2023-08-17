@@ -1,3 +1,15 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   printer.c                                          :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: tsankola <marvin@42.fr>                    +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2023/08/15 10:57:02 by tsankola          #+#    #+#             */
+/*   Updated: 2023/08/15 10:57:02 by tsankola         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "philo.h"
 
 #include <unistd.h>
@@ -70,4 +82,3 @@ int	printer_thread_init(t_printer_thread **pt, int size, pthread_mutex_t *pm)
 	pthread_mutex_init(&(*pt)->stop_mutex, NULL);
 	return (1);
 }
-

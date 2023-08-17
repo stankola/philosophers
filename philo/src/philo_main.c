@@ -116,7 +116,7 @@ void	phinish(t_philosopher *phils, pthread_t *threads, unsigned int args[],
 		printer_thread_del(&pt);
 		free(threads);
 	}
-	phree(&phils, args[no_of_phils]);	
+	phree(&phils, args[no_of_phils]);
 }
 
 int	main(int argc, char *argv[])
