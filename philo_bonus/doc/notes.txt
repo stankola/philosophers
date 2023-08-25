@@ -1,0 +1,6 @@
+TODO:
+* Convert printer
+	Done, I think. Needs to be tested
+* Convert Initializers etc. admin
+* Convert Philosophers
+* Convert Actions

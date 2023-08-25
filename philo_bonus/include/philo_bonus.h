@@ -1,17 +1,18 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   philo.h                                            :+:      :+:    :+:   */
+/*   philo_bonus.h                                      :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: tsankola <tsankola@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/07/04 18:18:03 by tsankola          #+#    #+#             */
-/*   Updated: 2023/08/25 16:53:55 by tsankola         ###   ########.fr       */
+/*   Updated: 2023/08/25 17:32:32 by tsankola         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #ifndef PHILO_H
 # define PHILO_H
+# include <semaphore.h>
 # include <pthread.h>
 # include <sys/types.h>
 # define LONG_SLEEP 10000
@@ -19,6 +20,8 @@
 # define SNOOZE 500
 # define PRINT_INTERVAL 1000
 # define PRINT_ENTRIES_PER_PHILOSOPHER 32
+# define PRINT_SEM "Print"
+# define PRINTER_STOP_SEM "Printer_stop"
 
 enum e_arg_indices
 {
@@ -47,6 +50,7 @@ enum e_print_cases
 typedef struct s_fork
 {
 	volatile int	taken;
+	pthread_mutex_t	grab_mutex;
 	pthread_mutex_t	fork_mutex;
 }	t_fork;
 
@@ -76,10 +80,7 @@ typedef struct s_philosopher
 	long int				prev_meal;
 	int						no_of_phils;
 	long int				inception;
-	t_fork					*r_utensil;
-	t_fork					*l_utensil;
 	int volatile			*death;
-	pthread_mutex_t			*mutexes;
 	t_print_buffer volatile	**print_buffer;
 }	t_philosopher;
 
@@ -87,8 +88,8 @@ typedef struct s_printer_thread
 {
 	t_print_buffer volatile				*buffers[2];
 	t_print_buffer volatile				*buffer;
-	pthread_mutex_t						*print_mutex;
-	pthread_mutex_t						stop_mutex;
+	sem_t								*print_sem;
+	sem_t								*stop_sem;
 	int volatile						stop;
 }	t_printer_thread;
 
@@ -131,8 +132,7 @@ void		printer_thread_stop(t_printer_thread *pt);
 
 void		*printer_thread(t_printer_thread *pt);
 
-int			printer_thread_init(t_printer_thread **pt, int size,
-				pthread_mutex_t *print_mutex);
+int			printer_thread_init(t_printer_thread **pt, int size, sem_t *ps);
 
 int			printer_thread_del(t_printer_thread **pt);
 

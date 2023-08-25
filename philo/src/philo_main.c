@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   philo_main.c                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: tsankola <marvin@42.fr>                    +#+  +:+       +#+        */
+/*   By: tsankola <tsankola@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/06/16 14:26:33 by tsankola          #+#    #+#             */
-/*   Updated: 2023/07/05 00:57:57 by tsankola         ###   ########.fr       */
+/*   Updated: 2023/08/25 16:56:52 by tsankola         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -59,7 +59,6 @@ static void	phree(t_philosopher **phils, int philc)
 	while (i < philc)
 	{
 		pthread_mutex_destroy(&(*phils + i)->r_utensil->fork_mutex);
-		pthread_mutex_destroy(&(*phils + i)->r_utensil->grab_mutex);
 		i++;
 	}
 	pthread_mutex_destroy(&(*phils)->mutexes[DEATH_MUTEX_I]);
@@ -91,8 +90,7 @@ t_philosopher	*phinitialize(unsigned int a[], int volatile *death,
 			0, 0, 0, a[no_of_phils], now, &fs[i % a[no_of_phils]], &fs[i - 1],
 			death, mutexes, (volatile t_print_buffer **)&(*pt)->buffer};
 		fs[i - 1].taken = 0;
-		if (pthread_mutex_init(&fs[i - 1].fork_mutex, NULL)
-			|| pthread_mutex_init(&fs[i - 1].grab_mutex, NULL))
+		if (pthread_mutex_init(&fs[i - 1].fork_mutex, NULL))
 		{
 			phree(&ps, a[no_of_phils]);
 			return (NULL);

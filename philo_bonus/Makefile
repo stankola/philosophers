@@ -1,14 +1,14 @@
-#******************************************************************************#
+# **************************************************************************** #
 #                                                                              #
 #                                                         :::      ::::::::    #
 #    Makefile                                           :+:      :+:    :+:    #
 #                                                     +:+ +:+         +:+      #
-#    By: tsankola <marvin@42.fr>                    +#+  +:+       +#+         #
+#    By: tsankola <tsankola@student.hive.fi>        +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2023/05/20 20:58:24 by tsankola          #+#    #+#              #
-#    Updated: 2023/06/27 20:13:03 by tsankola         ###   ########.fr        #
+#    Updated: 2023/08/25 17:06:24 by tsankola         ###   ########.fr        #
 #                                                                              #
-#******************************************************************************#
+# **************************************************************************** #
 
 NAME = philo_bonus
 
@@ -32,7 +32,8 @@ INCDIR = include
 
 INCDIR_BONUS = include_bonus
 
-_SRC =	parsing_bonus.c philo_main.bonus.c philosopher_actions_bonus.c \
+_SRC =	parsing_bonus.c philo_main_bonus.c philosopher_actions2_bonus.c \
+		philosopher_actions_bonus.c print_buffer_bonus.c printer_bonus.c \
 		timer_bonus.c
 SRC = $(patsubst %, $(SRCDIR)/%, $(_SRC))
 

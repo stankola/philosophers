@@ -1,16 +1,16 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   philosopher_actions.c                              :+:      :+:    :+:   */
+/*   philosopher_actions_bonus.c                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: tsankola <tsankola@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/07/04 18:17:38 by tsankola          #+#    #+#             */
-/*   Updated: 2023/08/25 16:56:21 by tsankola         ###   ########.fr       */
+/*   Updated: 2023/08/25 17:08:35 by tsankola         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "philo.h"
+#include "philo_bonus.h"
 
 #include <unistd.h>
 #include <sys/time.h>
@@ -35,52 +35,19 @@ void	think(t_philosopher *phil)
 
 void	eat(t_philosopher *phil)
 {
-	if ((phil->id % 2) && take_fork(phil, phil->r_utensil))
-		if (! take_fork(phil, phil->l_utensil))
-			drop_fork(phil->r_utensil);
-	if (!(phil->id % 2) && take_fork(phil, phil->l_utensil))
-		if (! take_fork(phil, phil->r_utensil))
-			drop_fork(phil->l_utensil);
-	if (!phil->dead)
-	{
-		if (! should_die(phil))
-		{
-			phil->prev_meal = get_time_in_us();
-			phrint(EAT, phil);
-			phleep(phil, phil->tte);
-		}
-		drop_fork(phil->r_utensil);
-		drop_fork(phil->l_utensil);
-		phil->eat_count++;
-	}
+	phrint(EAT, phil);
+	phleep(phil, phil->tte);
+	return ;
 }
 
 int	take_fork(t_philosopher *phil, t_fork *f)
 {
-	while (! should_die(phil))
-	{
-		pthread_mutex_lock(&(f->fork_mutex));
-/* 		if (should_die(phil))
-		{
-			pthread_mutex_unlock(&(f->fork_mutex));
-			return (0);
-		}
- */		if (f->taken == 0)
-		{
-			f->taken = 1;
-			phrint(FORK_TAKE, phil);
-			pthread_mutex_unlock(&(f->fork_mutex));
-			return (1);
-		}
-		pthread_mutex_unlock(&(f->fork_mutex));
-		usleep(SNOOZE);
-	}
+	phrint(FORK_TAKE, phil);
+	phrint(FORK_TAKE, phil);
 	return (0);
 }
 
 inline void	drop_fork(t_fork *f)
 {
-	pthread_mutex_lock(&(f->fork_mutex));
-	f->taken = 0;
-	pthread_mutex_unlock(&(f->fork_mutex));
+	return ;
 }
