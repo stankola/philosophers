@@ -6,7 +6,7 @@
 /*   By: tsankola <tsankola@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/07/04 18:18:03 by tsankola          #+#    #+#             */
-/*   Updated: 2023/08/25 17:32:32 by tsankola         ###   ########.fr       */
+/*   Updated: 2023/08/27 15:43:17 by tsankola         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,8 +20,10 @@
 # define SNOOZE 500
 # define PRINT_INTERVAL 1000
 # define PRINT_ENTRIES_PER_PHILOSOPHER 32
-# define PRINT_SEM "Print"
+# define PRINT_SEM_NAME "Print"
+# define BUFFER_SEM_NAME "Printer_buffer"
 # define PRINTER_STOP_SEM "Printer_stop"
+# define DEATH_SEM_NAME "Exitus"
 
 enum e_arg_indices
 {
@@ -32,20 +34,20 @@ enum e_arg_indices
 	max_meals = 4
 };
 
-enum e_mutex_indices
-{
-	DEATH_MUTEX_I = 0,
-	PRINT_MUTEX_I = 1
-};
-
-enum e_print_cases
+typedef enum e_print_cases
 {
 	EAT,
 	SLEEP,
 	FORK_TAKE,
 	DIE,
 	THINK
-};
+}	t_print_case;
+
+typedef enum e_sem_name_cases
+{
+	PRINTER,
+	STOP
+}	t_sem_name_case;
 
 typedef struct s_fork
 {
@@ -70,27 +72,31 @@ typedef struct s_print_buffer
 
 typedef struct s_philosopher
 {
-	int						id;
-	int						ttd;
-	int						tte;
-	int						tts;
-	int						mm;
-	int						eat_count;
-	int						dead;
-	long int				prev_meal;
-	int						no_of_phils;
-	long int				inception;
-	int volatile			*death;
-	t_print_buffer volatile	**print_buffer;
+	int					id;
+	int					ttd;
+	int					tte;
+	int					tts;
+	int					mm;
+	int					eat_count;
+	int					dead;
+	long int			prev_meal;
+	int					no_of_phils;
+	long int			inception;
+	t_printer_thread	*stenographer;
+	sem_t				*utensils;
 }	t_philosopher;
 
 typedef struct s_printer_thread
 {
-	t_print_buffer volatile				*buffers[2];
-	t_print_buffer volatile				*buffer;
-	sem_t								*print_sem;
-	sem_t								*stop_sem;
-	int volatile						stop;
+	t_print_buffer volatile	*buffers[2];
+	t_print_buffer volatile	*buffer;
+	sem_t					*print_sem;		/// global print semaphore
+	sem_t					*stop_sem;		/// stopping semaphore
+	char					*stop_sem_name;
+	sem_t					*buffer_sem;	/// semaphore to protect buffers
+	char					*buffer_sem_name;
+	int volatile			stop;
+	int						id;
 }	t_printer_thread;
 
 long int	get_time_in_us(void);
@@ -117,7 +123,7 @@ pthread_t	*phacilitate(t_philosopher *phils, int philc, t_printer_thread *pt);
 
 int			should_die(t_philosopher *phil);
 
-void		phrint(int print_case, t_philosopher *phil);
+void		phrint(t_printer_thread *pt, long int time, int id, int print_case);
 
 int			print_buffer_init(t_print_buffer **pb, int size);
 
@@ -132,8 +138,10 @@ void		printer_thread_stop(t_printer_thread *pt);
 
 void		*printer_thread(t_printer_thread *pt);
 
-int			printer_thread_init(t_printer_thread **pt, int size, sem_t *ps);
+int			printer_thread_init(t_printer_thread **pt, int size, int id);
 
 int			printer_thread_del(t_printer_thread **pt);
+
+char		*name_generator(char *prefix, int suffix);
 
 #endif

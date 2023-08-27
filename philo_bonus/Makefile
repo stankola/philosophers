@@ -6,7 +6,7 @@
 #    By: tsankola <tsankola@student.hive.fi>        +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2023/05/20 20:58:24 by tsankola          #+#    #+#              #
-#    Updated: 2023/08/25 17:06:24 by tsankola         ###   ########.fr        #
+#    Updated: 2023/08/27 16:07:26 by tsankola         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -34,7 +34,7 @@ INCDIR_BONUS = include_bonus
 
 _SRC =	parsing_bonus.c philo_main_bonus.c philosopher_actions2_bonus.c \
 		philosopher_actions_bonus.c print_buffer_bonus.c printer_bonus.c \
-		timer_bonus.c
+		timer_bonus.c philosopher_utils_bonus.c
 SRC = $(patsubst %, $(SRCDIR)/%, $(_SRC))
 
 _OBJ = $(patsubst %.c, %.o, $(_SRC))

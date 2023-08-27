@@ -6,7 +6,7 @@
 /*   By: tsankola <tsankola@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/06/16 14:26:33 by tsankola          #+#    #+#             */
-/*   Updated: 2023/08/25 16:38:20 by tsankola         ###   ########.fr       */
+/*   Updated: 2023/08/27 16:06:35 by tsankola         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,42 +17,48 @@
 #include <pthread.h>
 #include <sys/time.h>
 
-// Pointers might point to unallocated memory at the end but the caller should
-// know not to use them from the return value
-static int	phallocate(void)
-{
-	return (0);
-}
-
-// pthread_mutex_destroy might fail, should make sure that threads have
-// stopped executing.
-static void	phree(void)
+ void	phree(void)
 {
 	return ;
 }
 
-void	phinitialize(void)
+void	phinitialize(unsigned int a[5], t_philosopher **p)
 {
+	int		i;
+	long	now;
+	
+	now = get_time_in_ms();
+	*p = malloc(sizeof(t_philosopher) * a[no_of_phils]);
+	if (*p == NULL)
+		return ;
+	sem_open(PRINT_SEM_NAME, O_RDWR | O_CREAT, S_IRUSR | S_IWUSR, 1);
+	i = -1;
+	while (++i < a[no_of_phils])
+		(*p)[i] = (t_philosopher){i + 1, a[ttd], a[tte], a[tts], a[max_meals],
+				0, 0, 0, a[no_of_phils], now, NULL, NULL};
 	return ;
 }
 
-void	phinish(void)
+void	phinish(pid_t *children, t_philosopher *phils)
 {
+	// Unlink semaphores.
+	// Kill processes
 	return ;
 }
 
+#include <stdio.h>
 int	main(int argc, char *argv[])
 {
-	unsigned int		args[5];
-	int volatile		death;
-	t_printer_thread	*pt;
+	unsigned int	args[5];
+	sem_t			*death;
+	pid_t			*children;
+	t_philosopher	*phils;
 
-	if (parse_args(argc, argv, args) || args[no_of_phils] == 0
+ 	if (parse_args(argc, argv, args) || args[no_of_phils] == 0
 		|| (argc == 6 && args[max_meals] == 0))
 		return (22);
 	if (argc == 5)
 		args[max_meals] = 0;
-	pt = NULL;
-	death = 0;
+	phallocate(args, &phils);
 	return (0);
 }
