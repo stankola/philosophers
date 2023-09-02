@@ -1,42 +1,55 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   philosopher_actions2.c                             :+:      :+:    :+:   */
+/*   philosopher_actions2_bonus.c                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: tsankola <marvin@42.fr>                    +#+  +:+       +#+        */
+/*   By: tsankola <tsankola@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/07/05 17:42:12 by tsankola          #+#    #+#             */
-/*   Updated: 2023/07/05 17:42:13 by tsankola         ###   ########.fr       */
+/*   Updated: 2023/09/02 22:32:40 by tsankola         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "philo.h"
+#include "philo_bonus.h"
 
 #include <stdlib.h>
 #include <sys/time.h>
 #include <unistd.h>
 #include <pthread.h>
+#include <signal.h>
 
-static t_philosopher	*philosophize(t_philosopher *phil)
+static int	philosophize(t_philosopher *phil)
 {
-	void	(*actions[3])(t_philosopher *);
-	int		i;
+//	void	(*actions[3])(t_philosopher *);
+	pthread_t	sten;
+	void		(**actions)(t_philosopher *);
+	int			i;
 
 	if (phil == NULL)
-		return (NULL);
-	actions[0] = &deep_think;
-	actions[1] = &think;
-	actions[2] = &eat;
-	i = 1;
-	phil->prev_meal = get_time_in_us();
-	while (! should_die(phil))
+		return (0);
+	phil->pid = fork();
+	if (phil->pid = fork() == 0)
 	{
-		(*actions[i])(phil);
-		if ((i + 1) % 3 == 0 && ! phil->dead && phil->mm != 0 && ! --phil->mm)
-			return (phil);
-		i = (i + 1) % 3;
+		//TODO printer initialize
+		actions = (void (*[3])(t_philosopher *)){deep_think, think, eat};
+		i = 1;
+		phil->prev_meal = get_time_in_us();
+		printer_thread_init(&phil->stenographer, 1, phil->id);
+		pthread_create(&sten, NULL, printer_thread, phil->stenographer);
+		while (! should_die(phil))
+		{
+			(*actions[i])(phil);
+			if ((i + 1) % 3 == 0 && ! phil->dead && phil->mm != 0 && ! --phil->mm)
+				break ;
+			i = (i + 1) % 3;
+		}
+		printer_thread_stop(phil->stenographer);
+		pthread_join(sten, NULL);
+		exit(0);
 	}
-	return (phil);
+	if (phil->pid = fork() < 0)
+		return (1);
+	return (0);
 }
 
 // phleep as in philo sleep
@@ -68,64 +81,38 @@ void	phleep(t_philosopher *phil, unsigned int duration)
 	}
 }
 
-pthread_t	*phacilitate(t_philosopher *phils, int philc, t_printer_thread *pt)
+int	phacilitate(t_philosopher *phils, int philc)
 {
-	pthread_t	*threads;
-	int			i;
-	int			err_check;
+	int		i;
+	int		err_check;
+	int		status;
+	sem_t	*printsem;
 
-	threads = malloc(sizeof(pthread_t) * (philc + 1));
-	if (threads == NULL)
-		return (NULL);
 	i = -1;
-	while (++i < philc + 1)
+	while (++i < philc)
 	{
-		if (i == 0)
-			err_check = pthread_create(&threads[i], NULL,
-					(void *(*)(void *))printer_thread, (void *)pt);
-		else
-		{
-			err_check = pthread_create(&threads[i], NULL,
-					(void *(*)(void *))philosophize, (void *)&phils[i - 1]);
-		}
-		if (err_check)
-		{
-			free(threads);
-			return (NULL);
-		}
+		if (philosophize(&phils[i]))
+			return (1);
 	}
-	return (threads);
-}
-
-void	phrint(int print_case, t_philosopher *phil)
-{
-	long int	time;
-
-	time = (get_time_in_ms() - phil->inception);
-	pthread_mutex_lock(&phil->mutexes[PRINT_MUTEX_I]);
-	print_buffer_write(*phil->print_buffer, time, phil->id, print_case);
-	pthread_mutex_unlock(&phil->mutexes[PRINT_MUTEX_I]);
+	waitpid(-1, &status, 0);
+	printsem = sem_open(PRINT_SEM_NAME, 0);
+	while (i > 0)
+		kill(phils[i].pid, SIGINT);
+	while (waitpid(-1, &status, 0) >= 0)
+		;
+	sem_close(printsem);
+	return (0);
 }
 
 int	should_die(t_philosopher *phil)
 {
 	if (phil->dead)
 		return (1);
-	pthread_mutex_lock(&phil->mutexes[DEATH_MUTEX_I]);
-	if (*phil->death)
+	if (get_time_in_us() - phil->prev_meal > phil->ttd)
 	{
-		pthread_mutex_unlock(&phil->mutexes[DEATH_MUTEX_I]);
 		phil->dead = 1;
-		return (-1);
-	}
-	if (get_time_in_us() - (phil->prev_meal + phil->ttd) > 0)
-	{
-		*phil->death = 1;
-		pthread_mutex_unlock(&phil->mutexes[DEATH_MUTEX_I]);
-		phil->dead = 1;
-		phrint(DIE, phil);
+		phrint(phil->stenographer, get_time_in_ms(), phil->id, DIE);
 		return (1);
 	}
-	pthread_mutex_unlock(&phil->mutexes[DEATH_MUTEX_I]);
 	return (0);
 }

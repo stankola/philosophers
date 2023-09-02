@@ -6,7 +6,7 @@
 /*   By: tsankola <tsankola@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/06/16 14:26:33 by tsankola          #+#    #+#             */
-/*   Updated: 2023/08/27 16:06:35 by tsankola         ###   ########.fr       */
+/*   Updated: 2023/09/02 22:00:06 by tsankola         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,7 +17,7 @@
 #include <pthread.h>
 #include <sys/time.h>
 
- void	phree(void)
+void	phree(void)
 {
 	return ;
 }
@@ -31,18 +31,21 @@ void	phinitialize(unsigned int a[5], t_philosopher **p)
 	*p = malloc(sizeof(t_philosopher) * a[no_of_phils]);
 	if (*p == NULL)
 		return ;
-	sem_open(PRINT_SEM_NAME, O_RDWR | O_CREAT, S_IRUSR | S_IWUSR, 1);
 	i = -1;
 	while (++i < a[no_of_phils])
-		(*p)[i] = (t_philosopher){i + 1, a[ttd], a[tte], a[tts], a[max_meals],
-				0, 0, 0, a[no_of_phils], now, NULL, NULL};
-	return ;
+		(*p)[i] = (t_philosopher){-1, i + 1, a[ttd], a[tte], a[tts],
+				a[max_meals], 0, 0, 0, a[no_of_phils], now, NULL, NULL, NULL};
+	sem_close(sem_open(PRINT_SEM_NAME, O_RDWR | O_CREAT, S_IRUSR | S_IWUSR, 1));
+	sem_close(sem_open(FORK_SEM_NAME, O_RDWR | O_CREAT, S_IRUSR | S_IWUSR, a[no_of_phils]));
+	sem_close(sem_open(FORK2_SEM_NAME, O_RDWR | O_CREAT, S_IRUSR | S_IWUSR, a[no_of_phils] / 2));
 }
 
-void	phinish(pid_t *children, t_philosopher *phils)
+void	phinish(t_philosopher *phils)
 {
-	// Unlink semaphores.
-	// Kill processes
+	sem_unlink(PRINT_SEM_NAME);
+	sem_unlink(FORK_SEM_NAME);
+	sem_unlink(FORK2_SEM_NAME);
+	// unlink printer_thread semaphores?? Is there need?
 	return ;
 }
 
@@ -59,6 +62,8 @@ int	main(int argc, char *argv[])
 		return (22);
 	if (argc == 5)
 		args[max_meals] = 0;
-	phallocate(args, &phils);
+	phinitialize(args, &phils);
+	phacilitate(phils, args[no_of_phils]);
+	phinish(phils);
 	return (0);
 }

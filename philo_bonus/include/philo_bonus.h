@@ -6,7 +6,7 @@
 /*   By: tsankola <tsankola@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/07/04 18:18:03 by tsankola          #+#    #+#             */
-/*   Updated: 2023/08/27 15:43:17 by tsankola         ###   ########.fr       */
+/*   Updated: 2023/09/02 22:05:11 by tsankola         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,6 +24,8 @@
 # define BUFFER_SEM_NAME "Printer_buffer"
 # define PRINTER_STOP_SEM "Printer_stop"
 # define DEATH_SEM_NAME "Exitus"
+# define FORK_SEM_NAME "Utensils"
+# define FORK2_SEM_NAME "Utensils2"
 
 enum e_arg_indices
 {
@@ -49,13 +51,6 @@ typedef enum e_sem_name_cases
 	STOP
 }	t_sem_name_case;
 
-typedef struct s_fork
-{
-	volatile int	taken;
-	pthread_mutex_t	grab_mutex;
-	pthread_mutex_t	fork_mutex;
-}	t_fork;
-
 typedef struct s_print_entry
 {
 	long int	time;
@@ -72,6 +67,7 @@ typedef struct s_print_buffer
 
 typedef struct s_philosopher
 {
+	pid_t				pid;
 	int					id;
 	int					ttd;
 	int					tte;
@@ -83,6 +79,7 @@ typedef struct s_philosopher
 	int					no_of_phils;
 	long int			inception;
 	t_printer_thread	*stenographer;
+	sem_t				*utensil_pairs;
 	sem_t				*utensils;
 }	t_philosopher;
 
@@ -113,13 +110,13 @@ void		think(t_philosopher *phil);
 
 void		deep_think(t_philosopher *phil);
 
-int			take_fork(t_philosopher *phil, t_fork *f);
+int			take_forks(t_philosopher *phil);
 
-void		drop_fork(t_fork *f);
+void		drop_forks(t_philosopher *phil);
 
 void		phleep(t_philosopher *phil, unsigned int duration);
 
-pthread_t	*phacilitate(t_philosopher *phils, int philc, t_printer_thread *pt);
+int			phacilitate(t_philosopher *phils, int philc);
 
 int			should_die(t_philosopher *phil);
 
