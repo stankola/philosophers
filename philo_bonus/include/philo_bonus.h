@@ -6,7 +6,7 @@
 /*   By: tsankola <tsankola@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/07/04 18:18:03 by tsankola          #+#    #+#             */
-/*   Updated: 2023/09/02 22:05:11 by tsankola         ###   ########.fr       */
+/*   Updated: 2023/09/03 07:47:16 by tsankola         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -65,6 +65,19 @@ typedef struct s_print_buffer
 	volatile int			length;
 }	t_print_buffer;
 
+typedef struct s_printer_thread
+{
+	t_print_buffer volatile	*buffers[2];
+	t_print_buffer volatile	*buffer;
+	sem_t					*print_sem;		/// global print semaphore
+	sem_t					*stop_sem;		/// stopping semaphore
+	char					*stop_sem_name;
+	sem_t					*buffer_sem;	/// semaphore to protect buffers
+	char					*buffer_sem_name;
+	int volatile			stop;
+	int						id;
+}	t_printer_thread;
+
 typedef struct s_philosopher
 {
 	pid_t				pid;
@@ -82,19 +95,6 @@ typedef struct s_philosopher
 	sem_t				*utensil_pairs;
 	sem_t				*utensils;
 }	t_philosopher;
-
-typedef struct s_printer_thread
-{
-	t_print_buffer volatile	*buffers[2];
-	t_print_buffer volatile	*buffer;
-	sem_t					*print_sem;		/// global print semaphore
-	sem_t					*stop_sem;		/// stopping semaphore
-	char					*stop_sem_name;
-	sem_t					*buffer_sem;	/// semaphore to protect buffers
-	char					*buffer_sem_name;
-	int volatile			stop;
-	int						id;
-}	t_printer_thread;
 
 long int	get_time_in_us(void);
 
@@ -120,7 +120,7 @@ int			phacilitate(t_philosopher *phils, int philc);
 
 int			should_die(t_philosopher *phil);
 
-void		phrint(t_printer_thread *pt, long int time, int id, int print_case);
+void		phrint(t_philosopher *phil, int print_case);
 
 int			print_buffer_init(t_print_buffer **pb, int size);
 

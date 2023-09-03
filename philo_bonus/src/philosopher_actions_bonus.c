@@ -6,7 +6,7 @@
 /*   By: tsankola <tsankola@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/07/04 18:17:38 by tsankola          #+#    #+#             */
-/*   Updated: 2023/09/02 22:05:11 by tsankola         ###   ########.fr       */
+/*   Updated: 2023/09/03 16:31:34 by tsankola         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,19 +15,20 @@
 #include <unistd.h>
 #include <sys/time.h>
 #include <pthread.h>
+#include <stdio.h>
 
 // ie. sleep
 void	deep_think(t_philosopher *phil)
 {
-	phrint(phil->stenographer, get_time_in_ms(), phil->id, SLEEP);
+	phrint(phil, SLEEP);
 	phleep(phil, phil->tts);
 }
 
 void	think(t_philosopher *phil)
 {
-	int	time_to_meal;
-
-	phrint(phil->stenographer, get_time_in_ms(), phil->id, THINK);
+	int x;
+	sem_getvalue(phil->utensil_pairs, &x);
+	phrint(phil, THINK);
 	return ;
 }
 
@@ -40,7 +41,8 @@ void	eat(t_philosopher *phil)
 		return ;
 	}
 	take_forks(phil);
-	phrint(phil->stenographer, get_time_in_ms(), phil->id, EAT);
+	phil->prev_meal = get_time_in_us();
+	phrint(phil, EAT);
 	phleep(phil, phil->tte);
 	drop_forks(phil);
 	sem_post(phil->utensil_pairs);
@@ -52,11 +54,11 @@ int	take_forks(t_philosopher *phil)
 	sem_wait(phil->utensils);
 	if (!should_die(phil))
 	{
-		phrint(phil->stenographer, get_time_in_ms(), phil->id, FORK_TAKE);
+		phrint(phil, FORK_TAKE);
 		sem_wait(phil->utensils);
 		if (!should_die(phil))
 		{
-			phrint(phil->stenographer, get_time_in_ms(), phil->id, FORK_TAKE);
+			phrint(phil, FORK_TAKE);
 			return (0);
 		}
 		sem_post(phil->utensils);

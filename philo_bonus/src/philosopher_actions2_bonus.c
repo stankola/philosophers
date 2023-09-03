@@ -6,36 +6,39 @@
 /*   By: tsankola <tsankola@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/07/05 17:42:12 by tsankola          #+#    #+#             */
-/*   Updated: 2023/09/02 22:32:40 by tsankola         ###   ########.fr       */
+/*   Updated: 2023/09/03 16:59:05 by tsankola         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
-
-#include "philo_bonus.h"
 
 #include <stdlib.h>
 #include <sys/time.h>
 #include <unistd.h>
 #include <pthread.h>
 #include <signal.h>
+#include <sys/wait.h>
+#include "philo_bonus.h"
 
+#include <stdio.h>
+#include <fcntl.h>
 static int	philosophize(t_philosopher *phil)
 {
 //	void	(*actions[3])(t_philosopher *);
-	pthread_t	sten;
+//	pthread_t	sten;
 	void		(**actions)(t_philosopher *);
 	int			i;
 
 	if (phil == NULL)
 		return (0);
 	phil->pid = fork();
-	if (phil->pid = fork() == 0)
+	if (phil->pid == 0)
 	{
-		//TODO printer initialize
 		actions = (void (*[3])(t_philosopher *)){deep_think, think, eat};
 		i = 1;
-		phil->prev_meal = get_time_in_us();
 		printer_thread_init(&phil->stenographer, 1, phil->id);
-		pthread_create(&sten, NULL, printer_thread, phil->stenographer);
+		phil->utensils = sem_open(FORK_SEM_NAME, 0);
+		phil->utensil_pairs = sem_open(FORK2_SEM_NAME, 0);
+//		pthread_create(&sten, NULL, (void * (*)(void *))printer_thread, phil->stenographer);
+		phil->prev_meal = get_time_in_us();
 		while (! should_die(phil))
 		{
 			(*actions[i])(phil);
@@ -43,11 +46,12 @@ static int	philosophize(t_philosopher *phil)
 				break ;
 			i = (i + 1) % 3;
 		}
-		printer_thread_stop(phil->stenographer);
-		pthread_join(sten, NULL);
+		printf("%d I'm outta here, yo\n", phil->id);
+//		printer_thread_stop(phil->stenographer);
+//		pthread_join(sten, NULL);
 		exit(0);
 	}
-	if (phil->pid = fork() < 0)
+	if (phil->pid < 0)
 		return (1);
 	return (0);
 }
@@ -84,7 +88,6 @@ void	phleep(t_philosopher *phil, unsigned int duration)
 int	phacilitate(t_philosopher *phils, int philc)
 {
 	int		i;
-	int		err_check;
 	int		status;
 	sem_t	*printsem;
 
@@ -96,7 +99,7 @@ int	phacilitate(t_philosopher *phils, int philc)
 	}
 	waitpid(-1, &status, 0);
 	printsem = sem_open(PRINT_SEM_NAME, 0);
-	while (i > 0)
+	while (--i >= 0)
 		kill(phils[i].pid, SIGINT);
 	while (waitpid(-1, &status, 0) >= 0)
 		;
@@ -111,7 +114,7 @@ int	should_die(t_philosopher *phil)
 	if (get_time_in_us() - phil->prev_meal > phil->ttd)
 	{
 		phil->dead = 1;
-		phrint(phil->stenographer, get_time_in_ms(), phil->id, DIE);
+		phrint(phil, DIE);
 		return (1);
 	}
 	return (0);

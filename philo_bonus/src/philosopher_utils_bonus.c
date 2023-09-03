@@ -6,7 +6,7 @@
 /*   By: tsankola <tsankola@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/27 15:18:23 by tsankola          #+#    #+#             */
-/*   Updated: 2023/08/27 15:35:20 by tsankola         ###   ########.fr       */
+/*   Updated: 2023/09/03 01:01:00 by tsankola         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,14 +23,14 @@ static int	ph_pow(int x, int y)
 	return (x);
 }
 
-static char	*ph_itoa(int i)
-{
+char	*ph_itoa(int i)
+{	// Useless?
 	char	*a;
 	int		degree;
 	int		j;
 
 	degree = 1;
-	while (i / (ph_pow(10, degree)) > 0)			// int overflow possible
+	while (i / (ph_pow(10, degree)) > 0)		// int overflow possible
 		degree++;								// int overflow possible
 	a = malloc(sizeof(char) * (degree + 1));
 	if (a == NULL)

@@ -6,21 +6,36 @@
 /*   By: tsankola <tsankola@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/15 10:57:02 by tsankola          #+#    #+#             */
-/*   Updated: 2023/08/27 15:37:25 by tsankola         ###   ########.fr       */
+/*   Updated: 2023/09/03 16:58:54 by tsankola         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "philo_bonus.h"
-
 #include <unistd.h>
 #include <stdlib.h>
+#include <fcntl.h>
+#include <stdio.h>
+#include "philo_bonus.h"
 
-void	phrint(t_printer_thread *pt, long int time, int id, int print_case)
+void	phrint(t_philosopher *phil, int print_case)
 {
-	sem_wait(pt->buffer_sem);
-	print_buffer_write(pt->buffer, time, id, print_case);
-	sem_post(pt->buffer_sem);	
-}
+	long	time;
+
+	time = get_time_in_ms() - phil->inception;
+	if (print_case == EAT)
+		printf("%ld %d is eating\n", time, phil->id);
+	else if (print_case == SLEEP)
+		printf("%ld %d is sleeping\n", time, phil->id);
+	else if (print_case == FORK_TAKE)
+		printf("%ld %d has taken a fork\n", time, phil->id);
+	else if (print_case == THINK)
+		printf("%ld %d is thinking\n", time, phil->id);
+	else if (print_case == DIE)
+		printf("%ld %d died\n", time, phil->id);
+
+/* 	sem_wait(phil->stenographer->buffer_sem);
+	print_buffer_write(phil->stenographer->buffer, time, phil->id, print_case);
+	sem_post(phil->stenographer->buffer_sem);	
+ */}
 
 
 void	printer_thread_stop(t_printer_thread *pt)
@@ -98,9 +113,11 @@ int	printer_thread_init(t_printer_thread **pt, int size, int id)
 	(*pt)->buffer = (*pt)->buffers[0];
 	(*pt)->print_sem = sem_open(PRINT_SEM_NAME, O_RDWR);				// might fail
 	(*pt)->buffer_sem_name = name_generator(BUFFER_SEM_NAME, id);		// NULL check
+	unlink((*pt)->buffer_sem_name);
 	(*pt)->buffer_sem = sem_open((*pt)->buffer_sem_name, O_RDWR | O_CREAT, S_IRUSR | S_IWUSR, 1);		// might fail
 	(*pt)->stop = 0;
 	(*pt)->stop_sem_name = name_generator(PRINTER_STOP_SEM, id);		// NULL check
+	unlink((*pt)->stop_sem_name);
 	(*pt)->stop_sem = sem_open((*pt)->stop_sem_name, O_RDWR | O_CREAT, S_IRUSR | S_IWUSR, 1);			// might fail
 	return (1);
 }

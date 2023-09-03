@@ -6,7 +6,7 @@
 #    By: tsankola <tsankola@student.hive.fi>        +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2023/05/20 20:58:24 by tsankola          #+#    #+#              #
-#    Updated: 2023/08/27 16:07:26 by tsankola         ###   ########.fr        #
+#    Updated: 2023/09/03 00:57:26 by tsankola         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -40,7 +40,11 @@ SRC = $(patsubst %, $(SRCDIR)/%, $(_SRC))
 _OBJ = $(patsubst %.c, %.o, $(_SRC))
 OBJ = $(patsubst %, $(OBJDIR)/%, $(_OBJ))
 
-_SRC_BONUS = $(patsubst %.c, %_bonus.c, $(_SRC))
+#_SRC_BONUS = $(patsubst %.c, %_bonus.c, $(_SRC))
+_SRC_BONUS =	parsing_bonus.c philo_main_bonus.c \
+				philosopher_actions_bonus.c print_buffer_bonus.c \
+				timer_bonus.c philosopher_utils_bonus.c printer_bonus.c \
+				philosopher_actions2_bonus.c 
 SRC_BONUS = $(patsubst %, $(SRCDIR)/%, $(_SRC_BONUS))
 
 _OBJ_BONUS = $(patsubst %.c, %.o, $(_SRC_BONUS))
