@@ -6,7 +6,7 @@
 /*   By: tsankola <tsankola@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/15 10:57:02 by tsankola          #+#    #+#             */
-/*   Updated: 2023/09/03 16:58:54 by tsankola         ###   ########.fr       */
+/*   Updated: 2023/09/19 19:48:58 by tsankola         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,7 +21,7 @@ void	phrint(t_philosopher *phil, int print_case)
 	long	time;
 
 	time = get_time_in_ms() - phil->inception;
-	if (print_case == EAT)
+	/* if (print_case == EAT)
 		printf("%ld %d is eating\n", time, phil->id);
 	else if (print_case == SLEEP)
 		printf("%ld %d is sleeping\n", time, phil->id);
@@ -30,12 +30,12 @@ void	phrint(t_philosopher *phil, int print_case)
 	else if (print_case == THINK)
 		printf("%ld %d is thinking\n", time, phil->id);
 	else if (print_case == DIE)
-		printf("%ld %d died\n", time, phil->id);
+		printf("%ld %d died\n", time, phil->id); */
 
-/* 	sem_wait(phil->stenographer->buffer_sem);
+	sem_wait(phil->stenographer->buffer_sem);
 	print_buffer_write(phil->stenographer->buffer, time, phil->id, print_case);
 	sem_post(phil->stenographer->buffer_sem);	
- */}
+}
 
 
 void	printer_thread_stop(t_printer_thread *pt)

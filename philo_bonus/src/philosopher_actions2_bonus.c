@@ -6,7 +6,7 @@
 /*   By: tsankola <tsankola@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/07/05 17:42:12 by tsankola          #+#    #+#             */
-/*   Updated: 2023/09/03 16:59:05 by tsankola         ###   ########.fr       */
+/*   Updated: 2023/09/19 19:51:17 by tsankola         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,7 +23,7 @@
 static int	philosophize(t_philosopher *phil)
 {
 //	void	(*actions[3])(t_philosopher *);
-//	pthread_t	sten;
+	pthread_t	sten;
 	void		(**actions)(t_philosopher *);
 	int			i;
 
@@ -37,7 +37,7 @@ static int	philosophize(t_philosopher *phil)
 		printer_thread_init(&phil->stenographer, 1, phil->id);
 		phil->utensils = sem_open(FORK_SEM_NAME, 0);
 		phil->utensil_pairs = sem_open(FORK2_SEM_NAME, 0);
-//		pthread_create(&sten, NULL, (void * (*)(void *))printer_thread, phil->stenographer);
+		pthread_create(&sten, NULL, (void * (*)(void *))printer_thread, phil->stenographer);
 		phil->prev_meal = get_time_in_us();
 		while (! should_die(phil))
 		{
@@ -46,9 +46,9 @@ static int	philosophize(t_philosopher *phil)
 				break ;
 			i = (i + 1) % 3;
 		}
-		printf("%d I'm outta here, yo\n", phil->id);
-//		printer_thread_stop(phil->stenographer);
-//		pthread_join(sten, NULL);
+//		printf("%d I'm outta here, yo\n", phil->id);
+		printer_thread_stop(phil->stenographer);
+		pthread_join(sten, NULL);
 		exit(0);
 	}
 	if (phil->pid < 0)

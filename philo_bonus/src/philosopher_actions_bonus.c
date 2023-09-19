@@ -6,7 +6,7 @@
 /*   By: tsankola <tsankola@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/07/04 18:17:38 by tsankola          #+#    #+#             */
-/*   Updated: 2023/09/03 16:31:34 by tsankola         ###   ########.fr       */
+/*   Updated: 2023/09/19 19:54:37 by tsankola         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,8 +26,7 @@ void	deep_think(t_philosopher *phil)
 
 void	think(t_philosopher *phil)
 {
-	int x;
-	sem_getvalue(phil->utensil_pairs, &x);
+	phleep(phil, get_time_to_meal(phil));
 	phrint(phil, THINK);
 	return ;
 }
