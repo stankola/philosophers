@@ -6,7 +6,7 @@
 /*   By: tsankola <tsankola@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/15 10:57:02 by tsankola          #+#    #+#             */
-/*   Updated: 2023/09/19 19:48:58 by tsankola         ###   ########.fr       */
+/*   Updated: 2023/09/19 22:55:30 by tsankola         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -74,7 +74,6 @@ void	*printer_thread(t_printer_thread *pt)
 	int				ret_val;
 
 	buffer_i = 0;
-	pt->buffer = pt->buffers[buffer_i];
 	sem_wait(pt->stop_sem);
 	while (pt->stop == 0)
 	{

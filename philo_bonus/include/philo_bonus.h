@@ -6,7 +6,7 @@
 /*   By: tsankola <tsankola@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/07/04 18:18:03 by tsankola          #+#    #+#             */
-/*   Updated: 2023/09/03 07:47:16 by tsankola         ###   ########.fr       */
+/*   Updated: 2023/09/19 20:36:12 by tsankola         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,6 +20,8 @@
 # define SNOOZE 500
 # define PRINT_INTERVAL 1000
 # define PRINT_ENTRIES_PER_PHILOSOPHER 32
+# define EXIT_STARVED 1
+# define EXIT_SATIATED 0
 # define PRINT_SEM_NAME "Print"
 # define BUFFER_SEM_NAME "Printer_buffer"
 # define PRINTER_STOP_SEM "Printer_stop"

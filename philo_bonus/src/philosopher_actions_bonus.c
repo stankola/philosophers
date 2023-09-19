@@ -6,7 +6,7 @@
 /*   By: tsankola <tsankola@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/07/04 18:17:38 by tsankola          #+#    #+#             */
-/*   Updated: 2023/09/19 19:54:37 by tsankola         ###   ########.fr       */
+/*   Updated: 2023/09/19 20:12:46 by tsankola         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -50,7 +50,13 @@ void	eat(t_philosopher *phil)
 
 int	take_forks(t_philosopher *phil)
 {
+// Optimization: No need to check for dying between getting the forks. 
+// Philosopher should always be able to get both because forks are protected by
+// utensil_pairs
+
 	sem_wait(phil->utensils);
+	sem_wait(phil->utensils);
+/* 	sem_wait(phil->utensils);
 	if (!should_die(phil))
 	{
 		phrint(phil, FORK_TAKE);
@@ -63,7 +69,7 @@ int	take_forks(t_philosopher *phil)
 		sem_post(phil->utensils);
 	}
 	sem_post(phil->utensils);
-	return (1);
+ */	return (1);
 }
 
 inline void	drop_forks(t_philosopher *phil)

@@ -6,7 +6,7 @@
 /*   By: tsankola <tsankola@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/07/05 17:42:12 by tsankola          #+#    #+#             */
-/*   Updated: 2023/09/19 19:51:17 by tsankola         ###   ########.fr       */
+/*   Updated: 2023/09/20 00:29:43 by tsankola         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,40 +20,31 @@
 
 #include <stdio.h>
 #include <fcntl.h>
-static int	philosophize(t_philosopher *phil)
+static void	philosophize(t_philosopher *phil)
 {
-//	void	(*actions[3])(t_philosopher *);
 	pthread_t	sten;
 	void		(**actions)(t_philosopher *);
 	int			i;
 
-	if (phil == NULL)
-		return (0);
-	phil->pid = fork();
-	if (phil->pid == 0)
+	actions = (void (*[3])(t_philosopher *)){deep_think, think, eat};
+	i = 1;
+	printer_thread_init(&phil->stenographer, 1, phil->id);
+	phil->utensils = sem_open(FORK_SEM_NAME, 0);
+	phil->utensil_pairs = sem_open(FORK2_SEM_NAME, 0);
+	pthread_create(&sten, NULL, (void * (*)(void *))printer_thread, phil->stenographer);
+	phil->prev_meal = get_time_in_us();
+	while (! should_die(phil))
 	{
-		actions = (void (*[3])(t_philosopher *)){deep_think, think, eat};
-		i = 1;
-		printer_thread_init(&phil->stenographer, 1, phil->id);
-		phil->utensils = sem_open(FORK_SEM_NAME, 0);
-		phil->utensil_pairs = sem_open(FORK2_SEM_NAME, 0);
-		pthread_create(&sten, NULL, (void * (*)(void *))printer_thread, phil->stenographer);
-		phil->prev_meal = get_time_in_us();
-		while (! should_die(phil))
-		{
-			(*actions[i])(phil);
-			if ((i + 1) % 3 == 0 && ! phil->dead && phil->mm != 0 && ! --phil->mm)
-				break ;
-			i = (i + 1) % 3;
-		}
-//		printf("%d I'm outta here, yo\n", phil->id);
-		printer_thread_stop(phil->stenographer);
-		pthread_join(sten, NULL);
-		exit(0);
+		(*actions[i])(phil);
+		if ((i + 1) % 3 == 0 && ! phil->dead && phil->mm != 0 && ! --phil->mm)
+			break ;
+		i = (i + 1) % 3;
 	}
-	if (phil->pid < 0)
-		return (1);
-	return (0);
+	printer_thread_stop(phil->stenographer);
+	pthread_join(sten, NULL);
+	if (phil->dead)
+		exit(EXIT_STARVED);
+	exit(EXIT_SATIATED);
 }
 
 // phleep as in philo sleep
@@ -89,23 +80,87 @@ int	phacilitate(t_philosopher *phils, int philc)
 {
 	int		i;
 	int		status;
+	pid_t	exit_pid;
 	sem_t	*printsem;
 
 	i = -1;
 	while (++i < philc)
 	{
-		if (philosophize(&phils[i]))
-			return (1);
+		phils[i].pid = fork();
+		if (phils[i].pid == 0)
+			philosophize(&phils[i]);
+		if (phils[i].pid < 0)
+			break ;
 	}
-	waitpid(-1, &status, 0);
-	printsem = sem_open(PRINT_SEM_NAME, 0);
-	while (--i >= 0)
-		kill(phils[i].pid, SIGINT);
-	while (waitpid(-1, &status, 0) >= 0)
-		;
-	sem_close(printsem);
+	while (i > 0)
+	{
+		exit_pid = waitpid(-1, &status, 0);
+		if (WEXITSTATUS(status) == EXIT_STARVED)
+			break ;
+		i--;
+	}
+	if (i != 0)
+	{
+		printsem = sem_open(PRINT_SEM_NAME, 0);
+		while (--i >= 0)
+		{
+			if (phils[i].pid != exit_pid)
+				kill(phils[i].pid, SIGINT);
+		}
+		while (waitpid(-1, &status, 0) >= 0)
+			;
+		sem_close(printsem);
+	}
 	return (0);
 }
+
+/* 
+static void	stop(t_philosopher *phils, int i)
+{
+	while (--i > 0)
+		kill(phils[i].pid, SIGINT);
+}
+
+int	phacilitate(t_philosopher *phils, int philc)
+{
+	int		i;
+	int		status;
+	pid_t	exit_pid;
+	sem_t	*printsem;
+
+	i = -1;
+	while (++i < philc)
+	{
+		phils[i].pid = fork();
+		if (phils[i].pid == 0)
+			philosophize(&phils[i]);
+		if (phils[i].pid < 0)
+			break ;
+	}
+	if (i < philc)
+		stop(phils, i);
+	else
+		while (i >= 0)
+		{
+			exit_pid = waitpid(-1, &status, 0);
+			if (WEXITSTATUS(status) == EXIT_STARVED)
+				break ;
+			i--;
+		}
+	if (i != 0)
+	{
+		printsem = sem_open(PRINT_SEM_NAME, 0);
+		while (--i >= 0)
+		{
+			if (phils[i].pid != exit_pid)
+				kill(phils[i].pid, SIGINT);
+		}
+		while (waitpid(-1, &status, 0) >= 0)
+			;
+		sem_close(printsem);
+	}
+	return (0);
+} */
 
 int	should_die(t_philosopher *phil)
 {
