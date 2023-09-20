@@ -6,7 +6,7 @@
 /*   By: tsankola <tsankola@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/09/20 05:00:44 by tsankola          #+#    #+#             */
-/*   Updated: 2023/09/20 05:07:47 by tsankola         ###   ########.fr       */
+/*   Updated: 2023/09/20 05:17:07 by tsankola         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -69,9 +69,9 @@ void	phacilitate(t_philosopher *phils, int philc)
 		while (--i > 0)
 		{
 			exclude_pid = waitpid(-1, &status, 0);
-			if (WEXITSTATUS(status) == EXIT_STARVED)
+			if (!WIFSIGNALED(status) && WEXITSTATUS(status) == EXIT_STARVED)
 				break ;
-			else
+			else if (!WIFSIGNALED(status) && WEXITSTATUS(status) != EXIT_FULL)
 				printsem = sem_open(PRINT_SEM_NAME, 0);
 		}
 	}

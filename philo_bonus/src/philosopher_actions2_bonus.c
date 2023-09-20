@@ -6,7 +6,7 @@
 /*   By: tsankola <tsankola@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/07/05 17:42:12 by tsankola          #+#    #+#             */
-/*   Updated: 2023/09/20 05:08:10 by tsankola         ###   ########.fr       */
+/*   Updated: 2023/09/20 05:17:07 by tsankola         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -42,7 +42,7 @@ void	philosophize(t_philosopher *phil)
 	printer_thread_del(&phil->stenographer);
 	if (phil->dead)
 		exit(EXIT_STARVED);
-	exit(EXIT_SATIATED);
+	exit(EXIT_FULL);
 }
 
 // phleep as in philo sleep
