@@ -6,7 +6,7 @@
 /*   By: tsankola <tsankola@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/07/04 18:18:03 by tsankola          #+#    #+#             */
-/*   Updated: 2023/09/20 04:31:27 by tsankola         ###   ########.fr       */
+/*   Updated: 2023/09/20 05:06:22 by tsankola         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -115,6 +115,8 @@ void		deep_think(t_philosopher *phil);
 int			take_forks(t_philosopher *phil);
 
 void		drop_forks(t_philosopher *phil);
+
+void		philosophize(t_philosopher *phil);
 
 void		phleep(t_philosopher *phil, unsigned int duration);
 

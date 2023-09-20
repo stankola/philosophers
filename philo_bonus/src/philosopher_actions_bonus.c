@@ -6,7 +6,7 @@
 /*   By: tsankola <tsankola@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/07/04 18:17:38 by tsankola          #+#    #+#             */
-/*   Updated: 2023/09/20 04:34:38 by tsankola         ###   ########.fr       */
+/*   Updated: 2023/09/20 04:46:58 by tsankola         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -42,9 +42,9 @@ void	eat(t_philosopher *phil)
 	return ;
 }
 
-// Optimization: No need to check for dying between getting the forks.
-// Philosopher should always be able to get both because philosopher should have
-// hold of utensil_pairs semaphore at this point.
+// Optimization: No need to check for dying between getting the forks because
+// they should be available if we have utensil_pairs. Congestion might cause
+// a delay but it shouldn't be significant.
 // Returns 1 on success, 0 on failure
 int	take_forks(t_philosopher *phil)
 {
