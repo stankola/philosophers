@@ -6,7 +6,7 @@
 /*   By: tsankola <tsankola@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/15 10:57:02 by tsankola          #+#    #+#             */
-/*   Updated: 2023/09/19 22:55:30 by tsankola         ###   ########.fr       */
+/*   Updated: 2023/09/20 04:06:11 by tsankola         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -107,16 +107,18 @@ int	printer_thread_init(t_printer_thread **pt, int size, int id)
 	(*pt)->id = id;
 	(*pt)->buffers[0] = NULL;
 	(*pt)->buffers[1] = NULL;
-	print_buffer_init((t_print_buffer **)&(*pt)->buffers[0], size);		// NULL check
-	print_buffer_init((t_print_buffer **)&(*pt)->buffers[1], size);		// NULL check
+	print_buffer_init((t_print_buffer **)&(*pt)->buffers[0], size);
+	print_buffer_init((t_print_buffer **)&(*pt)->buffers[1], size);
 	(*pt)->buffer = (*pt)->buffers[0];
-	(*pt)->print_sem = sem_open(PRINT_SEM_NAME, O_RDWR);				// might fail
-	(*pt)->buffer_sem_name = name_generator(BUFFER_SEM_NAME, id);		// NULL check
+	(*pt)->print_sem = sem_open(PRINT_SEM_NAME, O_RDWR);
+	(*pt)->buffer_sem_name = name_generator(BUFFER_SEM_NAME, id);
 	unlink((*pt)->buffer_sem_name);
-	(*pt)->buffer_sem = sem_open((*pt)->buffer_sem_name, O_RDWR | O_CREAT, S_IRUSR | S_IWUSR, 1);		// might fail
+	(*pt)->buffer_sem = sem_open((*pt)->buffer_sem_name, O_RDWR | O_CREAT,
+		S_IRUSR | S_IWUSR, 1);
 	(*pt)->stop = 0;
-	(*pt)->stop_sem_name = name_generator(PRINTER_STOP_SEM, id);		// NULL check
+	(*pt)->stop_sem_name = name_generator(PRINTER_STOP_SEM, id);
 	unlink((*pt)->stop_sem_name);
-	(*pt)->stop_sem = sem_open((*pt)->stop_sem_name, O_RDWR | O_CREAT, S_IRUSR | S_IWUSR, 1);			// might fail
+	(*pt)->stop_sem = sem_open((*pt)->stop_sem_name, O_RDWR | O_CREAT,
+		S_IRUSR | S_IWUSR, 1);
 	return (1);
 }

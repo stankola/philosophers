@@ -6,7 +6,7 @@
 /*   By: tsankola <tsankola@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/06/16 14:26:33 by tsankola          #+#    #+#             */
-/*   Updated: 2023/09/03 16:26:25 by tsankola         ###   ########.fr       */
+/*   Updated: 2023/09/20 04:19:08 by tsankola         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,10 +17,6 @@
 #include <fcntl.h>
 #include "philo_bonus.h"
 
-void	phree(void)
-{
-	return ;
-}
 
 static void	init_semaphores(int philc)
 {
@@ -29,16 +25,18 @@ static void	init_semaphores(int philc)
 	sem_unlink(PRINT_SEM_NAME);
 	sem_unlink(FORK_SEM_NAME);
 	sem_unlink(FORK2_SEM_NAME);
-	sems[0] = sem_open(PRINT_SEM_NAME, O_RDWR | O_CREAT | O_EXCL, S_IRUSR | S_IWUSR, 1);
-	sems[1] = sem_open(FORK_SEM_NAME, O_RDWR | O_CREAT | O_EXCL, S_IRUSR | S_IWUSR, philc);
-	sems[2] = sem_open(FORK2_SEM_NAME, O_RDWR | O_CREAT | O_EXCL, S_IRUSR | S_IWUSR, philc / 2);
+	sems[0] = sem_open(PRINT_SEM_NAME, O_RDWR | O_CREAT | O_EXCL,
+		S_IRUSR | S_IWUSR, 1);
+	sems[1] = sem_open(FORK_SEM_NAME, O_RDWR | O_CREAT | O_EXCL,
+		S_IRUSR | S_IWUSR, philc);
+	sems[2] = sem_open(FORK2_SEM_NAME, O_RDWR | O_CREAT | O_EXCL,
+		S_IRUSR | S_IWUSR, philc / 2);
 	sem_close(sems[0]);
 	sem_close(sems[1]);
 	sem_close(sems[2]);
 }
 
-#include <stdio.h>
-void	phinitialize(unsigned int a[5], t_philosopher **p)
+static void	phinitialize(unsigned int a[5], t_philosopher **p)
 {
 	int		i;
 	long	now;
@@ -54,17 +52,15 @@ void	phinitialize(unsigned int a[5], t_philosopher **p)
 	init_semaphores(a[no_of_phils]);
 }
 
-void	phinish(t_philosopher *phils)
+static void	phinish(t_philosopher *phils)
 {
 	sem_unlink(PRINT_SEM_NAME);
 	sem_unlink(FORK_SEM_NAME);
 	sem_unlink(FORK2_SEM_NAME);
-	// unlink printer_thread semaphores?? Is there need?
 	free(phils);
 	return ;
 }
 
-#include <stdio.h>
 int	main(int argc, char *argv[])
 {
 	unsigned int	args[5];

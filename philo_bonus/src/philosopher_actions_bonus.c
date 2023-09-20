@@ -6,7 +6,7 @@
 /*   By: tsankola <tsankola@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/07/04 18:17:38 by tsankola          #+#    #+#             */
-/*   Updated: 2023/09/19 20:12:46 by tsankola         ###   ########.fr       */
+/*   Updated: 2023/09/20 04:23:25 by tsankola         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,48 +33,39 @@ void	think(t_philosopher *phil)
 
 void	eat(t_philosopher *phil)
 {
+	if (!take_forks(phil))
+		return ;
+	if (!should_die(phil))
+	{
+		phil->prev_meal = get_time_in_us();
+		phrint(phil, EAT);
+		phleep(phil, phil->tte);
+	}
+	drop_forks(phil);
+	return ;
+}
+
+// Optimization: No need to check for dying between getting the forks.
+// Philosopher should always be able to get both because philosopher should have
+// hold of utensil_pairs semaphore at this point.
+// Returns 1 on success, 0 on failure
+int	take_forks(t_philosopher *phil)
+{
 	sem_wait(phil->utensil_pairs);
 	if (should_die(phil))
 	{
 		sem_post(phil->utensil_pairs);
-		return ;
+		return (0);
 	}
-	take_forks(phil);
-	phil->prev_meal = get_time_in_us();
-	phrint(phil, EAT);
-	phleep(phil, phil->tte);
-	drop_forks(phil);
+	sem_wait(phil->utensils);
+	sem_wait(phil->utensils);
+	return (1);
+}
+
+void	drop_forks(t_philosopher *phil)
+{
+	sem_post(phil->utensils);
+	sem_post(phil->utensils);
 	sem_post(phil->utensil_pairs);
-	return ;
-}
-
-int	take_forks(t_philosopher *phil)
-{
-// Optimization: No need to check for dying between getting the forks. 
-// Philosopher should always be able to get both because forks are protected by
-// utensil_pairs
-
-	sem_wait(phil->utensils);
-	sem_wait(phil->utensils);
-/* 	sem_wait(phil->utensils);
-	if (!should_die(phil))
-	{
-		phrint(phil, FORK_TAKE);
-		sem_wait(phil->utensils);
-		if (!should_die(phil))
-		{
-			phrint(phil, FORK_TAKE);
-			return (0);
-		}
-		sem_post(phil->utensils);
-	}
-	sem_post(phil->utensils);
- */	return (1);
-}
-
-inline void	drop_forks(t_philosopher *phil)
-{
-	sem_post(phil->utensils);
-	sem_post(phil->utensils);
 	return ;
 }

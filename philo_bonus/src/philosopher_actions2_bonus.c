@@ -6,7 +6,7 @@
 /*   By: tsankola <tsankola@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/07/05 17:42:12 by tsankola          #+#    #+#             */
-/*   Updated: 2023/09/20 00:29:43 by tsankola         ###   ########.fr       */
+/*   Updated: 2023/09/20 04:17:41 by tsankola         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,10 +16,10 @@
 #include <pthread.h>
 #include <signal.h>
 #include <sys/wait.h>
-#include "philo_bonus.h"
-
 #include <stdio.h>
 #include <fcntl.h>
+#include "philo_bonus.h"
+
 static void	philosophize(t_philosopher *phil)
 {
 	pthread_t	sten;
@@ -31,7 +31,8 @@ static void	philosophize(t_philosopher *phil)
 	printer_thread_init(&phil->stenographer, 1, phil->id);
 	phil->utensils = sem_open(FORK_SEM_NAME, 0);
 	phil->utensil_pairs = sem_open(FORK2_SEM_NAME, 0);
-	pthread_create(&sten, NULL, (void * (*)(void *))printer_thread, phil->stenographer);
+	pthread_create(&sten, NULL,
+		(void * (*)(void *))printer_thread, phil->stenographer);
 	phil->prev_meal = get_time_in_us();
 	while (! should_die(phil))
 	{
@@ -42,6 +43,7 @@ static void	philosophize(t_philosopher *phil)
 	}
 	printer_thread_stop(phil->stenographer);
 	pthread_join(sten, NULL);
+	printer_thread_del(&phil->stenographer);
 	if (phil->dead)
 		exit(EXIT_STARVED);
 	exit(EXIT_SATIATED);
@@ -76,14 +78,43 @@ void	phleep(t_philosopher *phil, unsigned int duration)
 	}
 }
 
-int	phacilitate(t_philosopher *phils, int philc)
+/*
+pthread_t seems to leak by default when killed by signal
+==3568== 272 bytes in 1 blocks are possibly lost in loss record 16 of 20
+==3568==    at 0x48455EF: calloc (vg_replace_malloc.c:1328)
+==3568==    by 0x4010D52: calloc (rtld-malloc.h:44)
+==3568==    by 0x4010D52: allocate_dtv (dl-tls.c:375)
+==3568==    by 0x401174D: _dl_allocate_tls (dl-tls.c:634)
+==3568==    by 0x48E2BFE: allocate_stack (allocatestack.c:423)
+==3568==    by 0x48E2BFE: pthread_create@@GLIBC_2.34 (pthread_create.c:650)
+==3568==    by 0x10A712: philosophize (in /home/tsankola/hive/...)
+==3568==    by 0x10AAAC: phacilitate (in /home/tsankola/hive/...)
+==3568==    by 0x10971B: main (in /home/tsankola/hive/...)
+ */
+static void	stop(t_philosopher *phils, int i, pid_t	exclude_pid)
+{
+	int		status;
+	sem_t	*printsem;
+
+	printsem = sem_open(PRINT_SEM_NAME, 0);
+	while (--i >= 0)
+	{
+		if (exclude_pid != 0 && phils[i].pid != exclude_pid)
+			kill(phils[i].pid, SIGINT);
+	}
+	while (waitpid(-1, &status, 0) >= 0)
+		;
+	sem_close(printsem);
+}
+
+void	phacilitate(t_philosopher *phils, int philc)
 {
 	int		i;
 	int		status;
-	pid_t	exit_pid;
-	sem_t	*printsem;
+	pid_t	exclude_pid;
 
 	i = -1;
+	exclude_pid = 0;
 	while (++i < philc)
 	{
 		phils[i].pid = fork();
@@ -92,75 +123,15 @@ int	phacilitate(t_philosopher *phils, int philc)
 		if (phils[i].pid < 0)
 			break ;
 	}
-	while (i > 0)
-	{
-		exit_pid = waitpid(-1, &status, 0);
-		if (WEXITSTATUS(status) == EXIT_STARVED)
-			break ;
-		i--;
-	}
-	if (i != 0)
-	{
-		printsem = sem_open(PRINT_SEM_NAME, 0);
-		while (--i >= 0)
+	if (i == philc)
+		while (--i > 0)
 		{
-			if (phils[i].pid != exit_pid)
-				kill(phils[i].pid, SIGINT);
-		}
-		while (waitpid(-1, &status, 0) >= 0)
-			;
-		sem_close(printsem);
-	}
-	return (0);
-}
-
-/* 
-static void	stop(t_philosopher *phils, int i)
-{
-	while (--i > 0)
-		kill(phils[i].pid, SIGINT);
-}
-
-int	phacilitate(t_philosopher *phils, int philc)
-{
-	int		i;
-	int		status;
-	pid_t	exit_pid;
-	sem_t	*printsem;
-
-	i = -1;
-	while (++i < philc)
-	{
-		phils[i].pid = fork();
-		if (phils[i].pid == 0)
-			philosophize(&phils[i]);
-		if (phils[i].pid < 0)
-			break ;
-	}
-	if (i < philc)
-		stop(phils, i);
-	else
-		while (i >= 0)
-		{
-			exit_pid = waitpid(-1, &status, 0);
+			exclude_pid = waitpid(-1, &status, 0);
 			if (WEXITSTATUS(status) == EXIT_STARVED)
 				break ;
-			i--;
 		}
-	if (i != 0)
-	{
-		printsem = sem_open(PRINT_SEM_NAME, 0);
-		while (--i >= 0)
-		{
-			if (phils[i].pid != exit_pid)
-				kill(phils[i].pid, SIGINT);
-		}
-		while (waitpid(-1, &status, 0) >= 0)
-			;
-		sem_close(printsem);
-	}
-	return (0);
-} */
+	stop(phils, i, exclude_pid);
+}
 
 int	should_die(t_philosopher *phil)
 {

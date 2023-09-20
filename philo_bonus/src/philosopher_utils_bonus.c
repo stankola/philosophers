@@ -6,13 +6,12 @@
 /*   By: tsankola <tsankola@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/27 15:18:23 by tsankola          #+#    #+#             */
-/*   Updated: 2023/09/03 01:01:00 by tsankola         ###   ########.fr       */
+/*   Updated: 2023/09/20 04:08:38 by tsankola         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "philo_bonus.h"
-
 #include <stdlib.h>
+#include "philo_bonus.h"
 
 static int	ph_pow(int x, int y)
 {
@@ -23,15 +22,17 @@ static int	ph_pow(int x, int y)
 	return (x);
 }
 
+// Not actually used anywhere. Retained just in case.
+// int overflow in while loops possible
 char	*ph_itoa(int i)
-{	// Useless?
+{
 	char	*a;
 	int		degree;
 	int		j;
 
 	degree = 1;
-	while (i / (ph_pow(10, degree)) > 0)		// int overflow possible
-		degree++;								// int overflow possible
+	while (i / (ph_pow(10, degree)) > 0)
+		degree++;
 	a = malloc(sizeof(char) * (degree + 1));
 	if (a == NULL)
 		return (NULL);
@@ -52,13 +53,15 @@ static int	ph_strlen(char *s)
 	return (l);
 }
 
+// int might overflow in the loop but shouldn't be a problem within this
+// project's scope
 static int	ilen(int i)
 {
 	int	l;
 
 	l = 1;
-	while (i / (ph_pow(10, l)) > 0)			// int overflow possible
-		l++;								// int overflow possible
+	while (i / (ph_pow(10, l)) > 0)
+		l++;
 	return (l);
 }
 

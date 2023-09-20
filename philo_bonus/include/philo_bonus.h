@@ -6,7 +6,7 @@
 /*   By: tsankola <tsankola@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/07/04 18:18:03 by tsankola          #+#    #+#             */
-/*   Updated: 2023/09/19 20:36:12 by tsankola         ###   ########.fr       */
+/*   Updated: 2023/09/20 04:16:58 by tsankola         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -71,10 +71,10 @@ typedef struct s_printer_thread
 {
 	t_print_buffer volatile	*buffers[2];
 	t_print_buffer volatile	*buffer;
-	sem_t					*print_sem;		/// global print semaphore
-	sem_t					*stop_sem;		/// stopping semaphore
+	sem_t					*print_sem;
+	sem_t					*stop_sem;
 	char					*stop_sem_name;
-	sem_t					*buffer_sem;	/// semaphore to protect buffers
+	sem_t					*buffer_sem;
 	char					*buffer_sem_name;
 	int volatile			stop;
 	int						id;
@@ -118,7 +118,7 @@ void		drop_forks(t_philosopher *phil);
 
 void		phleep(t_philosopher *phil, unsigned int duration);
 
-int			phacilitate(t_philosopher *phils, int philc);
+void		phacilitate(t_philosopher *phils, int philc);
 
 int			should_die(t_philosopher *phil);
 
