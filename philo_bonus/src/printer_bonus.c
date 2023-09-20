@@ -6,7 +6,7 @@
 /*   By: tsankola <tsankola@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/15 10:57:02 by tsankola          #+#    #+#             */
-/*   Updated: 2023/09/20 04:31:12 by tsankola         ###   ########.fr       */
+/*   Updated: 2023/09/20 04:32:07 by tsankola         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,7 +23,7 @@ void	phrint(t_philosopher *phil, int print_case)
 	time = get_time_in_ms() - phil->inception;
 	sem_wait(phil->stenographer->buffer_sem);
 	print_buffer_write(phil->stenographer->buffer, time, phil->id, print_case);
-	sem_post(phil->stenographer->buffer_sem);	
+	sem_post(phil->stenographer->buffer_sem);
 }
 
 void	printer_thread_stop(t_printer_thread *pt)
@@ -82,7 +82,6 @@ void	*printer_thread(t_printer_thread *pt)
 	sem_post(pt->stop_sem);
 	return (NULL);
 }
-
 
 int	printer_thread_init(t_printer_thread **pt, int size, int id)
 {

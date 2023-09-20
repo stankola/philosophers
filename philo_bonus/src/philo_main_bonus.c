@@ -6,7 +6,7 @@
 /*   By: tsankola <tsankola@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/06/16 14:26:33 by tsankola          #+#    #+#             */
-/*   Updated: 2023/09/20 04:29:29 by tsankola         ###   ########.fr       */
+/*   Updated: 2023/09/20 04:32:45 by tsankola         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -66,7 +66,7 @@ int	main(int argc, char *argv[])
 	t_philosopher	*phils;
 
 	if (parse_args(argc, argv, args) || args[no_of_phils] == 0
-			|| (argc == 6 && args[max_meals] == 0))
+		|| (argc == 6 && args[max_meals] == 0))
 		return (22);
 	if (argc == 5)
 		args[max_meals] = 0;
