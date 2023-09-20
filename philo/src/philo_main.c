@@ -6,16 +6,14 @@
 /*   By: tsankola <tsankola@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/06/16 14:26:33 by tsankola          #+#    #+#             */
-/*   Updated: 2023/08/25 16:56:52 by tsankola         ###   ########.fr       */
+/*   Updated: 2023/09/20 04:36:39 by tsankola         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
-
-#include "philo.h"
 
 #include <unistd.h>
 #include <stdlib.h>
 #include <pthread.h>
-#include <sys/time.h>
+#include "philo.h"
 
 // Pointers might point to unallocated memory at the end but the caller should
 // know not to use them from the return value

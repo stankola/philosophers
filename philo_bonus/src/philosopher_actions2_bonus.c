@@ -6,7 +6,7 @@
 /*   By: tsankola <tsankola@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/07/05 17:42:12 by tsankola          #+#    #+#             */
-/*   Updated: 2023/09/20 04:28:09 by tsankola         ###   ########.fr       */
+/*   Updated: 2023/09/20 04:34:16 by tsankola         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,8 +16,6 @@
 #include <pthread.h>
 #include <signal.h>
 #include <sys/wait.h>
-#include <stdio.h>
-#include <fcntl.h>
 #include "philo_bonus.h"
 
 static void	philosophize(t_philosopher *phil)

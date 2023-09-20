@@ -6,16 +6,13 @@
 /*   By: tsankola <tsankola@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/07/04 18:17:38 by tsankola          #+#    #+#             */
-/*   Updated: 2023/09/20 04:23:25 by tsankola         ###   ########.fr       */
+/*   Updated: 2023/09/20 04:34:38 by tsankola         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "philo_bonus.h"
-
 #include <unistd.h>
 #include <sys/time.h>
-#include <pthread.h>
-#include <stdio.h>
+#include "philo_bonus.h"
 
 // ie. sleep
 void	deep_think(t_philosopher *phil)

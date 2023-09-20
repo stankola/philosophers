@@ -6,14 +6,13 @@
 /*   By: tsankola <tsankola@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/15 10:55:56 by tsankola          #+#    #+#             */
-/*   Updated: 2023/08/25 17:28:42 by tsankola         ###   ########.fr       */
+/*   Updated: 2023/09/20 04:33:38 by tsankola         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "philo_bonus.h"
-
 #include <stdlib.h>
 #include <stdio.h>
+#include "philo_bonus.h"
 
 int	print_buffer_init(t_print_buffer **pb, int size)
 {

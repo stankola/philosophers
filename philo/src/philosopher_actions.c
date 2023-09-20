@@ -6,15 +6,13 @@
 /*   By: tsankola <tsankola@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/07/04 18:17:38 by tsankola          #+#    #+#             */
-/*   Updated: 2023/08/25 16:56:21 by tsankola         ###   ########.fr       */
+/*   Updated: 2023/09/20 04:41:32 by tsankola         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "philo.h"
-
 #include <unistd.h>
-#include <sys/time.h>
 #include <pthread.h>
+#include "philo.h"
 
 // ie. sleep
 void	deep_think(t_philosopher *phil)
@@ -60,12 +58,7 @@ int	take_fork(t_philosopher *phil, t_fork *f)
 	while (! should_die(phil))
 	{
 		pthread_mutex_lock(&(f->fork_mutex));
-/* 		if (should_die(phil))
-		{
-			pthread_mutex_unlock(&(f->fork_mutex));
-			return (0);
-		}
- */		if (f->taken == 0)
+		if (f->taken == 0)
 		{
 			f->taken = 1;
 			phrint(FORK_TAKE, phil);

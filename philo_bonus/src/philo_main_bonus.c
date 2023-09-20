@@ -6,14 +6,12 @@
 /*   By: tsankola <tsankola@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/06/16 14:26:33 by tsankola          #+#    #+#             */
-/*   Updated: 2023/09/20 04:32:45 by tsankola         ###   ########.fr       */
+/*   Updated: 2023/09/20 04:35:47 by tsankola         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include <unistd.h>
 #include <stdlib.h>
-#include <pthread.h>
-#include <sys/time.h>
 #include <fcntl.h>
 #include "philo_bonus.h"
 

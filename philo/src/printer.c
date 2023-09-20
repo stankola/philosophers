@@ -6,14 +6,13 @@
 /*   By: tsankola <tsankola@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/15 10:57:02 by tsankola          #+#    #+#             */
-/*   Updated: 2023/09/19 22:48:01 by tsankola         ###   ########.fr       */
+/*   Updated: 2023/09/20 04:43:00 by tsankola         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "philo.h"
-
 #include <unistd.h>
 #include <stdlib.h>
+#include "philo.h"
 
 void	printer_thread_stop(t_printer_thread *pt)
 {
@@ -45,7 +44,6 @@ void	*printer_thread(t_printer_thread *pt)
 	unsigned int	buffer_i;
 
 	buffer_i = 0;
-//	pt->buffer = pt->buffers[buffer_i];
 	pthread_mutex_lock(&pt->stop_mutex);
 	while (pt->stop == 0)
 	{

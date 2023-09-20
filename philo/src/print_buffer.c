@@ -3,17 +3,16 @@
 /*                                                        :::      ::::::::   */
 /*   print_buffer.c                                     :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: tsankola <marvin@42.fr>                    +#+  +:+       +#+        */
+/*   By: tsankola <tsankola@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/15 10:55:56 by tsankola          #+#    #+#             */
-/*   Updated: 2023/08/15 10:56:00 by tsankola         ###   ########.fr       */
+/*   Updated: 2023/09/20 04:42:52 by tsankola         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "philo.h"
-
 #include <stdlib.h>
 #include <stdio.h>
+#include "philo.h"
 
 int	print_buffer_init(t_print_buffer **pb, int size)
 {

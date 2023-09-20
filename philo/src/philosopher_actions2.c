@@ -3,19 +3,18 @@
 /*                                                        :::      ::::::::   */
 /*   philosopher_actions2.c                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: tsankola <marvin@42.fr>                    +#+  +:+       +#+        */
+/*   By: tsankola <tsankola@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/07/05 17:42:12 by tsankola          #+#    #+#             */
-/*   Updated: 2023/07/05 17:42:13 by tsankola         ###   ########.fr       */
+/*   Updated: 2023/09/20 04:42:26 by tsankola         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
-
-#include "philo.h"
 
 #include <stdlib.h>
 #include <sys/time.h>
 #include <unistd.h>
 #include <pthread.h>
+#include "philo.h"
 
 static t_philosopher	*philosophize(t_philosopher *phil)
 {
