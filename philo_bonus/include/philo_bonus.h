@@ -6,7 +6,7 @@
 /*   By: tsankola <tsankola@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/07/04 18:18:03 by tsankola          #+#    #+#             */
-/*   Updated: 2023/09/20 05:17:13 by tsankola         ###   ########.fr       */
+/*   Updated: 2023/09/20 21:41:04 by tsankola         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,6 +22,7 @@
 # define PRINT_ENTRIES_PER_PHILOSOPHER 32
 # define EXIT_STARVED 1
 # define EXIT_FULL 0
+# define HANDS_SEM_NAME "Hands"
 # define PRINT_SEM_NAME "Print"
 # define BUFFER_SEM_NAME "Printer_buffer"
 # define PRINTER_STOP_SEM "Printer_stop"
@@ -93,9 +94,12 @@ typedef struct s_philosopher
 	long int			prev_meal;
 	int					no_of_phils;
 	long int			inception;
+	volatile int		holding_forks;
+	char				*hands_name;
 	t_printer_thread	*stenographer;
 	sem_t				*utensil_pairs;
 	sem_t				*utensils;
+	sem_t				*hand_sem;
 }	t_philosopher;
 
 long int	get_time_in_us(void);

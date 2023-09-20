@@ -6,7 +6,7 @@
 /*   By: tsankola <tsankola@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/07/05 17:42:12 by tsankola          #+#    #+#             */
-/*   Updated: 2023/09/20 05:17:07 by tsankola         ###   ########.fr       */
+/*   Updated: 2023/09/20 21:48:41 by tsankola         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,6 +16,14 @@
 #include <pthread.h>
 #include "philo_bonus.h"
 
+static void	init_phil(t_philosopher *phil)
+{
+	printer_thread_init(&phil->stenographer, 1, phil->id);
+	phil->utensils = sem_open(FORK_SEM_NAME, 0);
+	phil->utensil_pairs = sem_open(FORK2_SEM_NAME, 0);
+	phil->hand_sem = sem_open(phil->hands_name, 0);
+}
+
 void	philosophize(t_philosopher *phil)
 {
 	pthread_t	sten;
@@ -24,9 +32,7 @@ void	philosophize(t_philosopher *phil)
 
 	actions = (void (*[3])(t_philosopher *)){deep_think, think, eat};
 	i = 1;
-	printer_thread_init(&phil->stenographer, 1, phil->id);
-	phil->utensils = sem_open(FORK_SEM_NAME, 0);
-	phil->utensil_pairs = sem_open(FORK2_SEM_NAME, 0);
+	init_phil(phil);
 	pthread_create(&sten, NULL,
 		(void *(*)(void *))printer_thread, phil->stenographer);
 	phil->prev_meal = get_time_in_us();

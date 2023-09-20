@@ -6,7 +6,7 @@
 /*   By: tsankola <tsankola@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/06/16 14:26:33 by tsankola          #+#    #+#             */
-/*   Updated: 2023/09/20 04:35:47 by tsankola         ###   ########.fr       */
+/*   Updated: 2023/09/20 21:56:43 by tsankola         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,7 +15,7 @@
 #include <fcntl.h>
 #include "philo_bonus.h"
 
-static void	init_semaphores(int philc)
+static void	init_semaphores(t_philosopher *phils, int philc)
 {
 	sem_t	*sems[3];
 
@@ -31,6 +31,14 @@ static void	init_semaphores(int philc)
 	sem_close(sems[0]);
 	sem_close(sems[1]);
 	sem_close(sems[2]);
+	while (--philc >= 0)
+	{
+		phils[philc].hands_name = name_generator(HANDS_SEM_NAME, philc + 1);
+		sem_unlink(phils[philc].hands_name);
+		phils[philc].hand_sem = sem_open(phils[philc].hands_name,
+			O_RDWR | O_CREAT | O_EXCL, S_IRUSR | S_IWUSR, 1);
+		sem_close(phils[philc].hand_sem);
+	}
 }
 
 static void	phinitialize(unsigned int a[5], t_philosopher **p)
@@ -45,8 +53,9 @@ static void	phinitialize(unsigned int a[5], t_philosopher **p)
 	i = -1;
 	while (++i < (int)a[no_of_phils])
 		(*p)[i] = (t_philosopher){-1, i + 1, a[ttd], a[tte], a[tts],
-			a[max_meals], 0, 0, 0, a[no_of_phils], now, NULL, NULL, NULL};
-	init_semaphores(a[no_of_phils]);
+			a[max_meals], 0, 0, 0, a[no_of_phils], now, 0,
+			NULL, NULL, NULL, NULL, NULL};
+	init_semaphores(*p, a[no_of_phils]);
 }
 
 static void	phinish(t_philosopher *phils)
