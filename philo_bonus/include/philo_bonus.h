@@ -6,12 +6,12 @@
 /*   By: tsankola <tsankola@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/07/04 18:18:03 by tsankola          #+#    #+#             */
-/*   Updated: 2023/09/20 04:16:58 by tsankola         ###   ########.fr       */
+/*   Updated: 2023/09/20 04:31:27 by tsankola         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#ifndef PHILO_H
-# define PHILO_H
+#ifndef PHILO_BONUS_H
+# define PHILO_BONUS_H
 # include <semaphore.h>
 # include <pthread.h>
 # include <sys/types.h>

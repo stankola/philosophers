@@ -6,7 +6,7 @@
 /*   By: tsankola <tsankola@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/07/05 17:42:12 by tsankola          #+#    #+#             */
-/*   Updated: 2023/09/20 04:17:41 by tsankola         ###   ########.fr       */
+/*   Updated: 2023/09/20 04:28:09 by tsankola         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,7 +32,7 @@ static void	philosophize(t_philosopher *phil)
 	phil->utensils = sem_open(FORK_SEM_NAME, 0);
 	phil->utensil_pairs = sem_open(FORK2_SEM_NAME, 0);
 	pthread_create(&sten, NULL,
-		(void * (*)(void *))printer_thread, phil->stenographer);
+		(void *(*)(void *))printer_thread, phil->stenographer);
 	phil->prev_meal = get_time_in_us();
 	while (! should_die(phil))
 	{
@@ -124,12 +124,14 @@ void	phacilitate(t_philosopher *phils, int philc)
 			break ;
 	}
 	if (i == philc)
+	{
 		while (--i > 0)
 		{
 			exclude_pid = waitpid(-1, &status, 0);
 			if (WEXITSTATUS(status) == EXIT_STARVED)
 				break ;
 		}
+	}
 	stop(phils, i, exclude_pid);
 }
 

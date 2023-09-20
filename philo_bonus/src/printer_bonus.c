@@ -6,7 +6,7 @@
 /*   By: tsankola <tsankola@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/15 10:57:02 by tsankola          #+#    #+#             */
-/*   Updated: 2023/09/20 04:06:11 by tsankola         ###   ########.fr       */
+/*   Updated: 2023/09/20 04:31:12 by tsankola         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,22 +21,10 @@ void	phrint(t_philosopher *phil, int print_case)
 	long	time;
 
 	time = get_time_in_ms() - phil->inception;
-	/* if (print_case == EAT)
-		printf("%ld %d is eating\n", time, phil->id);
-	else if (print_case == SLEEP)
-		printf("%ld %d is sleeping\n", time, phil->id);
-	else if (print_case == FORK_TAKE)
-		printf("%ld %d has taken a fork\n", time, phil->id);
-	else if (print_case == THINK)
-		printf("%ld %d is thinking\n", time, phil->id);
-	else if (print_case == DIE)
-		printf("%ld %d died\n", time, phil->id); */
-
 	sem_wait(phil->stenographer->buffer_sem);
 	print_buffer_write(phil->stenographer->buffer, time, phil->id, print_case);
 	sem_post(phil->stenographer->buffer_sem);	
 }
-
 
 void	printer_thread_stop(t_printer_thread *pt)
 {
@@ -114,11 +102,11 @@ int	printer_thread_init(t_printer_thread **pt, int size, int id)
 	(*pt)->buffer_sem_name = name_generator(BUFFER_SEM_NAME, id);
 	unlink((*pt)->buffer_sem_name);
 	(*pt)->buffer_sem = sem_open((*pt)->buffer_sem_name, O_RDWR | O_CREAT,
-		S_IRUSR | S_IWUSR, 1);
+			S_IRUSR | S_IWUSR, 1);
 	(*pt)->stop = 0;
 	(*pt)->stop_sem_name = name_generator(PRINTER_STOP_SEM, id);
 	unlink((*pt)->stop_sem_name);
 	(*pt)->stop_sem = sem_open((*pt)->stop_sem_name, O_RDWR | O_CREAT,
-		S_IRUSR | S_IWUSR, 1);
+			S_IRUSR | S_IWUSR, 1);
 	return (1);
 }
