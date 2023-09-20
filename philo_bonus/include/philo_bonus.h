@@ -6,7 +6,7 @@
 /*   By: tsankola <tsankola@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/07/04 18:18:03 by tsankola          #+#    #+#             */
-/*   Updated: 2023/09/20 21:41:04 by tsankola         ###   ########.fr       */
+/*   Updated: 2023/09/20 22:17:05 by tsankola         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,7 +18,7 @@
 # define LONG_SLEEP 10000
 # define MEDIUM_SLEEP 2500
 # define SNOOZE 500
-# define PRINT_INTERVAL 1000
+# define PRINT_INTERVAL 500
 # define PRINT_ENTRIES_PER_PHILOSOPHER 32
 # define EXIT_STARVED 1
 # define EXIT_FULL 0
@@ -119,6 +119,8 @@ void		deep_think(t_philosopher *phil);
 int			take_forks(t_philosopher *phil);
 
 void		drop_forks(t_philosopher *phil);
+
+void		*get_fork_pair(t_philosopher *phil);
 
 void		philosophize(t_philosopher *phil);
 

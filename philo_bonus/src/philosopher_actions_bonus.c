@@ -6,7 +6,7 @@
 /*   By: tsankola <tsankola@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/07/04 18:17:38 by tsankola          #+#    #+#             */
-/*   Updated: 2023/09/20 21:55:50 by tsankola         ###   ########.fr       */
+/*   Updated: 2023/09/20 22:09:37 by tsankola         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -42,15 +42,6 @@ void	eat(t_philosopher *phil)
 	return ;
 }
 
-static void	*get_fork_pair(t_philosopher *phil)
-{
-	sem_wait(phil->utensil_pairs);
-	sem_wait(phil->hand_sem);
-	phil->holding_forks = 1;
-	sem_post(phil->hand_sem);
-	return (NULL);
-}
-
 // Optimization: No need to check for dying between getting the forks because
 // they should be available if we have utensil_pairs. Congestion might cause
 // a delay but it shouldn't be significant.
@@ -59,7 +50,7 @@ int	take_forks(t_philosopher *phil)
 {
 	pthread_t		pairtaker;
 
-	pthread_create(&pairtaker, NULL, (void*(*)(void *))get_fork_pair, phil);
+	pthread_create(&pairtaker, NULL, (void *(*)(void *))get_fork_pair, phil);
 	while (!should_die(phil))
 	{
 		sem_wait(phil->hand_sem);

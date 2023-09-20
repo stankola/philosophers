@@ -6,7 +6,7 @@
 /*   By: tsankola <tsankola@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/06/16 14:26:33 by tsankola          #+#    #+#             */
-/*   Updated: 2023/09/20 21:56:43 by tsankola         ###   ########.fr       */
+/*   Updated: 2023/09/20 22:05:57 by tsankola         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -36,7 +36,7 @@ static void	init_semaphores(t_philosopher *phils, int philc)
 		phils[philc].hands_name = name_generator(HANDS_SEM_NAME, philc + 1);
 		sem_unlink(phils[philc].hands_name);
 		phils[philc].hand_sem = sem_open(phils[philc].hands_name,
-			O_RDWR | O_CREAT | O_EXCL, S_IRUSR | S_IWUSR, 1);
+				O_RDWR | O_CREAT | O_EXCL, S_IRUSR | S_IWUSR, 1);
 		sem_close(phils[philc].hand_sem);
 	}
 }

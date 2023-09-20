@@ -6,7 +6,7 @@
 /*   By: tsankola <tsankola@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/07/05 17:42:12 by tsankola          #+#    #+#             */
-/*   Updated: 2023/09/20 21:48:41 by tsankola         ###   ########.fr       */
+/*   Updated: 2023/09/20 22:03:38 by tsankola         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,6 +15,15 @@
 #include <unistd.h>
 #include <pthread.h>
 #include "philo_bonus.h"
+
+void	*get_fork_pair(t_philosopher *phil)
+{
+	sem_wait(phil->utensil_pairs);
+	sem_wait(phil->hand_sem);
+	phil->holding_forks = 1;
+	sem_post(phil->hand_sem);
+	return (NULL);
+}
 
 static void	init_phil(t_philosopher *phil)
 {
