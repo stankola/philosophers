@@ -6,7 +6,7 @@
 /*   By: tsankola <tsankola@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/06/16 14:26:33 by tsankola          #+#    #+#             */
-/*   Updated: 2023/09/20 22:05:57 by tsankola         ###   ########.fr       */
+/*   Updated: 2023/09/21 00:30:25 by tsankola         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,6 +15,8 @@
 #include <fcntl.h>
 #include "philo_bonus.h"
 
+// It would probably improve the performance in simulation start if all the
+// semaphores were created here.
 static void	init_semaphores(t_philosopher *phils, int philc)
 {
 	sem_t	*sems[3];
@@ -60,11 +62,25 @@ static void	phinitialize(unsigned int a[5], t_philosopher **p)
 
 static void	phinish(t_philosopher *phils)
 {
+	int		i;
+	char	*s;
+
+	i = -1;
 	sem_unlink(PRINT_SEM_NAME);
 	sem_unlink(FORK_SEM_NAME);
 	sem_unlink(FORK2_SEM_NAME);
+	while (++i < phils[0].no_of_phils)
+	{
+		sem_unlink(phils[i].hands_name);
+		free(phils[i].hands_name);
+		s = name_generator(BUFFER_SEM_NAME, phils[i].id);
+		sem_unlink(s);
+		free(s);
+		s = name_generator(PRINTER_STOP_SEM, phils[i].id);
+		sem_unlink(s);
+		free(s);
+	}
 	free(phils);
-	return ;
 }
 
 int	main(int argc, char *argv[])

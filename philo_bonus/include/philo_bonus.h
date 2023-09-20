@@ -6,7 +6,7 @@
 /*   By: tsankola <tsankola@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/07/04 18:18:03 by tsankola          #+#    #+#             */
-/*   Updated: 2023/09/20 22:17:05 by tsankola         ###   ########.fr       */
+/*   Updated: 2023/09/20 23:46:56 by tsankola         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,7 +26,6 @@
 # define PRINT_SEM_NAME "Print"
 # define BUFFER_SEM_NAME "Printer_buffer"
 # define PRINTER_STOP_SEM "Printer_stop"
-# define DEATH_SEM_NAME "Exitus"
 # define FORK_SEM_NAME "Utensils"
 # define FORK2_SEM_NAME "Utensils2"
 

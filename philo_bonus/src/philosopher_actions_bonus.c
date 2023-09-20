@@ -6,7 +6,7 @@
 /*   By: tsankola <tsankola@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/07/04 18:17:38 by tsankola          #+#    #+#             */
-/*   Updated: 2023/09/20 22:09:37 by tsankola         ###   ########.fr       */
+/*   Updated: 2023/09/21 00:24:35 by tsankola         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -64,7 +64,9 @@ int	take_forks(t_philosopher *phil)
 		phleep(phil, SNOOZE);
 	}
 	sem_wait(phil->utensils);
+	phrint(phil, FORK_TAKE);
 	sem_wait(phil->utensils);
+	phrint(phil, FORK_TAKE);
 	return (1);
 }
 

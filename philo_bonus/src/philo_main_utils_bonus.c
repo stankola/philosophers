@@ -6,7 +6,7 @@
 /*   By: tsankola <tsankola@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/09/20 05:00:44 by tsankola          #+#    #+#             */
-/*   Updated: 2023/09/20 22:08:54 by tsankola         ###   ########.fr       */
+/*   Updated: 2023/09/21 00:13:12 by tsankola         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,43 +32,33 @@ static int	phork(t_philosopher *phils, int philc)
 	return (i);
 }
 
-static void	stop(t_philosopher *phils, int i, pid_t	exclude_pid,
-	sem_t *printsem)
+static void	stop(t_philosopher *phils, int i)
 {
 	int	status;
 
+	if (i > 0)
+		i = phils[0].no_of_phils - 1;
 	while (i >= 0)
-	{
-		if (exclude_pid != 0 && phils[i].pid != exclude_pid)
-			kill(phils[i].pid, SIGINT);
-		i--;
-	}
+		kill(phils[i--].pid, SIGINT);
 	while (waitpid(-1, &status, 0) >= 0)
 		;
-	if (printsem != NULL)
-		sem_close(printsem);
 }
 
 void	phacilitate(t_philosopher *phils, int philc)
 {
 	int		i;
 	int		status;
-	pid_t	exclude_pid;
-	sem_t	*printsem;
 
-	printsem = NULL;
-	exclude_pid = 0;
 	i = phork(phils, philc);
 	if (i == philc)
 	{
-		while (--i > 0)
+		while (--i >= 0)
 		{
-			exclude_pid = waitpid(-1, &status, 0);
-			if (!WIFSIGNALED(status) && WEXITSTATUS(status) == EXIT_STARVED)
+			waitpid(-1, &status, 0);
+			if (!WIFSIGNALED(status) && WEXITSTATUS(status) == EXIT_STARVED)		// Phil starved, no signal. Go kill everyone.
 				break ;
-			else if (!WIFSIGNALED(status) && WEXITSTATUS(status) != EXIT_FULL)
-				printsem = sem_open(PRINT_SEM_NAME, 0);
+			// Either a Phil ate all his meals or ^C was pressed. Wait for others to die.
 		}
 	}
-	stop(phils, i, exclude_pid, printsem);
+	stop(phils, i);
 }
