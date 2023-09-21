@@ -6,7 +6,7 @@
 /*   By: tsankola <tsankola@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/09/20 05:00:44 by tsankola          #+#    #+#             */
-/*   Updated: 2023/09/21 00:13:12 by tsankola         ###   ########.fr       */
+/*   Updated: 2023/09/21 10:15:05 by tsankola         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -61,4 +61,26 @@ void	phacilitate(t_philosopher *phils, int philc)
 		}
 	}
 	stop(phils, i);
+}
+
+void	init_philosopher(t_philosopher *p, unsigned int a[5], int id, long time)
+{
+	if (!p)
+		return ;
+	p->pid = -1;
+	p->id = id;
+	p->ttd = a[ttd];
+	p->tte = a[tte];
+	p->tts = a[tts];
+	p->mm = a[max_meals];
+	p->eat_count = 0;
+	p->dead = 0;
+	p->prev_meal = 0;
+	p->no_of_phils = a[no_of_phils];
+	p->inception = time;
+	p->holding_forks = 0;
+	name_generator(p->hands_name, HANDS_SEM_NAME, p->id);
+	p->utensil_pairs = NULL;
+	p->utensils = NULL;
+	p->hand_sem = NULL;
 }

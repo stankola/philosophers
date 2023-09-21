@@ -6,7 +6,7 @@
 /*   By: tsankola <tsankola@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/06/16 14:26:33 by tsankola          #+#    #+#             */
-/*   Updated: 2023/09/21 00:30:25 by tsankola         ###   ########.fr       */
+/*   Updated: 2023/09/21 10:15:05 by tsankola         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -35,7 +35,7 @@ static void	init_semaphores(t_philosopher *phils, int philc)
 	sem_close(sems[2]);
 	while (--philc >= 0)
 	{
-		phils[philc].hands_name = name_generator(HANDS_SEM_NAME, philc + 1);
+		name_generator(phils[philc].hands_name, HANDS_SEM_NAME, philc + 1);
 		sem_unlink(phils[philc].hands_name);
 		phils[philc].hand_sem = sem_open(phils[philc].hands_name,
 				O_RDWR | O_CREAT | O_EXCL, S_IRUSR | S_IWUSR, 1);
@@ -54,16 +54,14 @@ static void	phinitialize(unsigned int a[5], t_philosopher **p)
 		return ;
 	i = -1;
 	while (++i < (int)a[no_of_phils])
-		(*p)[i] = (t_philosopher){-1, i + 1, a[ttd], a[tte], a[tts],
-			a[max_meals], 0, 0, 0, a[no_of_phils], now, 0,
-			NULL, NULL, NULL, NULL, NULL};
+		init_philosopher(&(*p)[i], a, i + 1, now);
 	init_semaphores(*p, a[no_of_phils]);
 }
 
 static void	phinish(t_philosopher *phils)
 {
 	int		i;
-	char	*s;
+	char	s[SEM_NAME_LEN];
 
 	i = -1;
 	sem_unlink(PRINT_SEM_NAME);
@@ -72,13 +70,10 @@ static void	phinish(t_philosopher *phils)
 	while (++i < phils[0].no_of_phils)
 	{
 		sem_unlink(phils[i].hands_name);
-		free(phils[i].hands_name);
-		s = name_generator(BUFFER_SEM_NAME, phils[i].id);
+		name_generator(s, BUFFER_SEM_NAME, phils[i].id);
 		sem_unlink(s);
-		free(s);
-		s = name_generator(PRINTER_STOP_SEM, phils[i].id);
+		name_generator(s, PRINTER_STOP_SEM, phils[i].id);
 		sem_unlink(s);
-		free(s);
 	}
 	free(phils);
 }

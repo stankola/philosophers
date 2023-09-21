@@ -6,7 +6,7 @@
 /*   By: tsankola <tsankola@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/27 15:18:23 by tsankola          #+#    #+#             */
-/*   Updated: 2023/09/20 04:08:38 by tsankola         ###   ########.fr       */
+/*   Updated: 2023/09/21 10:15:46 by tsankola         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -43,16 +43,6 @@ char	*ph_itoa(int i)
 	return (a);
 }
 
-static int	ph_strlen(char *s)
-{
-	int	l;
-
-	l = 0;
-	while (*s++ != '\0')
-		l++;
-	return (l);
-}
-
 // int might overflow in the loop but shouldn't be a problem within this
 // project's scope
 static int	ilen(int i)
@@ -65,19 +55,18 @@ static int	ilen(int i)
 	return (l);
 }
 
-char	*name_generator(char *prefix, int suffix)
+void	name_generator(char *buffer, char *prefix, int suffix)
 {
-	char	*name;
-	int		s_l;
+	int		suf_pos;
 	int		i;
+	int		j;
 
-	s_l = ilen(suffix);
-	name = malloc(sizeof(char) * (ph_strlen(prefix) + ilen(suffix) + 1));
 	i = -1;
-	while (++i < ph_strlen(prefix))
-		name[i] = prefix[i];
-	while (i < (ph_strlen(prefix) + ilen(suffix)))
-		name[i++] = '0' + suffix / ph_pow(10, --s_l) % 10;
-	name[i] = '\0';
-	return (name);
+	while (prefix[++i] != '\0')
+		buffer[i] = prefix[i];
+	suf_pos = ilen(suffix);
+	j = -1;
+	while (++j < ilen(suffix))
+		buffer[i++] = '0' + suffix / ph_pow(10, --suf_pos) % 10;
+	buffer[i] = '\0';
 }

@@ -6,7 +6,7 @@
 /*   By: tsankola <tsankola@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/07/04 18:17:38 by tsankola          #+#    #+#             */
-/*   Updated: 2023/09/21 00:24:35 by tsankola         ###   ########.fr       */
+/*   Updated: 2023/09/21 09:00:25 by tsankola         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -51,18 +51,20 @@ int	take_forks(t_philosopher *phil)
 	pthread_t		pairtaker;
 
 	pthread_create(&pairtaker, NULL, (void *(*)(void *))get_fork_pair, phil);
+	pthread_detach(pairtaker);
 	while (!should_die(phil))
 	{
 		sem_wait(phil->hand_sem);
 		if (phil->holding_forks == 1)
 		{
-			pthread_join(pairtaker, NULL);
 			sem_post(phil->hand_sem);
 			break ;
 		}
 		sem_post(phil->hand_sem);
 		phleep(phil, SNOOZE);
 	}
+	if (phil->dead)
+		return (0);
 	sem_wait(phil->utensils);
 	phrint(phil, FORK_TAKE);
 	sem_wait(phil->utensils);
